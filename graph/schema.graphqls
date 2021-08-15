@@ -1,0 +1,26 @@
+# Queries definition
+type Query {
+  todo: String!
+}
+
+# Mutations definition
+type Mutation {
+  register(input: RegisterInput!): String!
+  login(input: LoginInput!): String!
+  refreshToken(input: RefreshTokenInput!): String!
+}
+
+input RegisterInput {
+  displayName: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput {
+  token: String!
+}
