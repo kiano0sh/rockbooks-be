@@ -2,7 +2,6 @@ package database
 
 import (
 	"fmt"
-	"log"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,7 +14,7 @@ func InitDB() *gorm.DB {
 	dsn := "host=localhost user=rockbooks password=rockbooks dbname=rockbooks port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	fmt.Println("auto migration has been ran successfully ✅")

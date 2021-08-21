@@ -2,9 +2,44 @@
 
 package model
 
+type AudioBook struct {
+	CreatedBy    *User  `json:"createdBy"`
+	Book         *Book  `json:"book"`
+	CursorStarts int    `json:"cursorStarts"`
+	CursorEnds   int    `json:"cursorEnds"`
+	CreatedAt    string `json:"createdAt"`
+}
+
+type Author struct {
+	Name       string       `json:"name"`
+	Surname    string       `json:"surname"`
+	Book       []*Book      `json:"book"`
+	Publishers []*Publisher `json:"publishers"`
+}
+
+type Book struct {
+	Name      string       `json:"name"`
+	Author    *Author      `json:"author"`
+	Publisher *Publisher   `json:"publisher"`
+	Audios    []*AudioBook `json:"audios"`
+	Pages     []*BookPage  `json:"pages"`
+	CreatedAt string       `json:"createdAt"`
+}
+
+type BookPage struct {
+	Content    string `json:"content"`
+	PageNumber int    `json:"pageNumber"`
+}
+
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type Publisher struct {
+	Name    string    `json:"name"`
+	Book    []*Book   `json:"book"`
+	Authors []*Author `json:"authors"`
 }
 
 type RefreshTokenInput struct {
@@ -15,4 +50,10 @@ type RegisterInput struct {
 	DisplayName string `json:"displayName"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
+}
+
+type User struct {
+	DisplayName string  `json:"displayName"`
+	Email       string  `json:"email"`
+	Avatar      *string `json:"avatar"`
 }

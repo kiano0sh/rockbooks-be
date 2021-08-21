@@ -57,7 +57,31 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 	return token, nil
 }
 
-func (r *queryResolver) Todo(ctx context.Context) (string, error) {
+func (r *queryResolver) Self(ctx context.Context) (*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Publisher(ctx context.Context, id string) (*model.Publisher, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Book(ctx context.Context, id string) (*model.Book, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -69,3 +93,13 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) Todo(ctx context.Context) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}

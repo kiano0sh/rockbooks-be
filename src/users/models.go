@@ -7,4 +7,5 @@ type User struct {
 	DisplayName string `gorm:"size:128"`
 	Email       string `gorm:"uniqueIndex"`
 	Password    string
+	Avatar      string `gorm:"size:256"`
 }

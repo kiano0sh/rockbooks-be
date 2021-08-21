@@ -1,6 +1,12 @@
 # Queries definition
 type Query {
-  todo: String!
+  self: User!
+  authors: [Author]
+  author(id: ID!): Author!
+  publishers: [Publisher]
+  publisher(id: ID!): Publisher!
+  books: [Book]
+  book(id: ID!): Book!
 }
 
 # Mutations definition
@@ -8,6 +14,47 @@ type Mutation {
   register(input: RegisterInput!): String!
   login(input: LoginInput!): String!
   refreshToken(input: RefreshTokenInput!): String!
+}
+
+type User {
+  displayName: String!
+  email: String!
+  avatar: String
+}
+
+type Author {
+  name: String!
+  surname: String!
+  book: [Book!]
+  publishers: [Publisher!]
+}
+
+type Publisher {
+  name: String!
+  book: [Book!]
+  authors: [Author!]
+}
+
+type AudioBook {
+  createdBy: User!
+  book: Book!
+  cursorStarts: Int!
+  cursorEnds: Int!
+  createdAt: String!
+}
+
+type BookPage {
+  content: String!
+  pageNumber: Int!
+}
+
+type Book {
+  name: String!
+  author: Author!
+  publisher: Publisher!
+  audios: [AudioBook!]
+  pages: [BookPage!]
+  createdAt: String!
 }
 
 input RegisterInput {
