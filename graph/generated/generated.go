@@ -43,14 +43,6 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	AudioBook struct {
-		Book         func(childComplexity int) int
-		CreatedAt    func(childComplexity int) int
-		CreatedBy    func(childComplexity int) int
-		CursorEnds   func(childComplexity int) int
-		CursorStarts func(childComplexity int) int
-	}
-
 	Author struct {
 		Book       func(childComplexity int) int
 		Name       func(childComplexity int) int
@@ -64,6 +56,14 @@ type ComplexityRoot struct {
 		Name      func(childComplexity int) int
 		Pages     func(childComplexity int) int
 		Publisher func(childComplexity int) int
+	}
+
+	BookAudio struct {
+		Book         func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		CreatedBy    func(childComplexity int) int
+		CursorEnds   func(childComplexity int) int
+		CursorStarts func(childComplexity int) int
 	}
 
 	BookPage struct {
@@ -130,41 +130,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "AudioBook.book":
-		if e.complexity.AudioBook.Book == nil {
-			break
-		}
-
-		return e.complexity.AudioBook.Book(childComplexity), true
-
-	case "AudioBook.createdAt":
-		if e.complexity.AudioBook.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.AudioBook.CreatedAt(childComplexity), true
-
-	case "AudioBook.createdBy":
-		if e.complexity.AudioBook.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.AudioBook.CreatedBy(childComplexity), true
-
-	case "AudioBook.cursorEnds":
-		if e.complexity.AudioBook.CursorEnds == nil {
-			break
-		}
-
-		return e.complexity.AudioBook.CursorEnds(childComplexity), true
-
-	case "AudioBook.cursorStarts":
-		if e.complexity.AudioBook.CursorStarts == nil {
-			break
-		}
-
-		return e.complexity.AudioBook.CursorStarts(childComplexity), true
-
 	case "Author.book":
 		if e.complexity.Author.Book == nil {
 			break
@@ -227,6 +192,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Book.Publisher(childComplexity), true
+
+	case "BookAudio.book":
+		if e.complexity.BookAudio.Book == nil {
+			break
+		}
+
+		return e.complexity.BookAudio.Book(childComplexity), true
+
+	case "BookAudio.createdAt":
+		if e.complexity.BookAudio.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.BookAudio.CreatedAt(childComplexity), true
+
+	case "BookAudio.createdBy":
+		if e.complexity.BookAudio.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.BookAudio.CreatedBy(childComplexity), true
+
+	case "BookAudio.cursorEnds":
+		if e.complexity.BookAudio.CursorEnds == nil {
+			break
+		}
+
+		return e.complexity.BookAudio.CursorEnds(childComplexity), true
+
+	case "BookAudio.cursorStarts":
+		if e.complexity.BookAudio.CursorStarts == nil {
+			break
+		}
+
+		return e.complexity.BookAudio.CursorStarts(childComplexity), true
 
 	case "BookPage.content":
 		if e.complexity.BookPage.Content == nil {
@@ -484,7 +484,7 @@ type Publisher {
   authors: [Author!]
 }
 
-type AudioBook {
+type BookAudio {
   createdBy: User!
   book: Book!
   cursorStarts: Int!
@@ -501,7 +501,7 @@ type Book {
   name: String!
   author: Author!
   publisher: Publisher!
-  audios: [AudioBook!]
+  audios: [BookAudio!]
   pages: [BookPage!]
   createdAt: String!
 }
@@ -670,181 +670,6 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
-
-func (ec *executionContext) _AudioBook_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.AudioBook) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AudioBook",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.User)
-	fc.Result = res
-	return ec.marshalNUser2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AudioBook_book(ctx context.Context, field graphql.CollectedField, obj *model.AudioBook) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AudioBook",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Book, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Book)
-	fc.Result = res
-	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AudioBook_cursorStarts(ctx context.Context, field graphql.CollectedField, obj *model.AudioBook) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AudioBook",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CursorStarts, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AudioBook_cursorEnds(ctx context.Context, field graphql.CollectedField, obj *model.AudioBook) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AudioBook",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CursorEnds, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _AudioBook_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.AudioBook) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "AudioBook",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
 
 func (ec *executionContext) _Author_name(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	defer func() {
@@ -1077,9 +902,9 @@ func (ec *executionContext) _Book_audios(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.AudioBook)
+	res := resTmp.([]*model.BookAudio)
 	fc.Result = res
-	return ec.marshalOAudioBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAudioBookᚄ(ctx, field.Selections, res)
+	return ec.marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudioᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Book_pages(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
@@ -1123,6 +948,181 @@ func (ec *executionContext) _Book_createdAt(ctx context.Context, field graphql.C
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "Book",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookAudio_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookAudio",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedBy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookAudio_book(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookAudio",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Book, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Book)
+	fc.Result = res
+	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookAudio_cursorStarts(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookAudio",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CursorStarts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookAudio_cursorEnds(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookAudio",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CursorEnds, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookAudio_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookAudio",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3053,53 +3053,6 @@ func (ec *executionContext) unmarshalInputRegisterInput(ctx context.Context, obj
 
 // region    **************************** object.gotpl ****************************
 
-var audioBookImplementors = []string{"AudioBook"}
-
-func (ec *executionContext) _AudioBook(ctx context.Context, sel ast.SelectionSet, obj *model.AudioBook) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, audioBookImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("AudioBook")
-		case "createdBy":
-			out.Values[i] = ec._AudioBook_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "book":
-			out.Values[i] = ec._AudioBook_book(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "cursorStarts":
-			out.Values[i] = ec._AudioBook_cursorStarts(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "cursorEnds":
-			out.Values[i] = ec._AudioBook_cursorEnds(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createdAt":
-			out.Values[i] = ec._AudioBook_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var authorImplementors = []string{"Author"}
 
 func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, obj *model.Author) graphql.Marshaler {
@@ -3163,6 +3116,53 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Book_pages(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Book_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var bookAudioImplementors = []string{"BookAudio"}
+
+func (ec *executionContext) _BookAudio(ctx context.Context, sel ast.SelectionSet, obj *model.BookAudio) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, bookAudioImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BookAudio")
+		case "createdBy":
+			out.Values[i] = ec._BookAudio_createdBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "book":
+			out.Values[i] = ec._BookAudio_book(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cursorStarts":
+			out.Values[i] = ec._BookAudio_cursorStarts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cursorEnds":
+			out.Values[i] = ec._BookAudio_cursorEnds(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._BookAudio_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3679,16 +3679,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAudioBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAudioBook(ctx context.Context, sel ast.SelectionSet, v *model.AudioBook) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._AudioBook(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNAuthor2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v model.Author) graphql.Marshaler {
 	return ec._Author(ctx, sel, &v)
 }
@@ -3715,6 +3705,16 @@ func (ec *executionContext) marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooks�
 		return graphql.Null
 	}
 	return ec._Book(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v *model.BookAudio) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._BookAudio(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx context.Context, sel ast.SelectionSet, v *model.BookPage) graphql.Marshaler {
@@ -4059,46 +4059,6 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAudioBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAudioBookᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AudioBook) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNAudioBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAudioBook(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v []*model.Author) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -4271,6 +4231,46 @@ func (ec *executionContext) marshalOBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooks�
 		return graphql.Null
 	}
 	return ec._Book(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudioᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.BookAudio) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.BookPage) graphql.Marshaler {

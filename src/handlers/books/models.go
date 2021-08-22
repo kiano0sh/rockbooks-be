@@ -18,7 +18,7 @@ type Publisher struct {
 	Books   []Book
 }
 
-type AudioBook struct {
+type BookAudio struct {
 	gorm.Model
 	UserID       uint
 	BookID       uint
@@ -26,7 +26,7 @@ type AudioBook struct {
 	CursorEnds   uint
 }
 
-type Page struct {
+type BookPage struct {
 	gorm.Model
 	Content    string
 	PageNumber int
@@ -36,8 +36,8 @@ type Page struct {
 type Book struct {
 	gorm.Model
 	Name        string `gorm:"size:128"`
-	Pages       []Page
-	AudioBooks  []AudioBook
+	Pages       []BookPage
+	AudioBooks  []BookAudio
 	AuthorID    uint
 	PublisherID uint
 }

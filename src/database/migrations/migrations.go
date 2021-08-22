@@ -16,7 +16,7 @@ func InitMigrations(db *gorm.DB) {
 	handleError(db.AutoMigrate(&users.User{}))
 	handleError(db.AutoMigrate(&books.Publisher{}))
 	handleError(db.AutoMigrate(&books.Author{}))
-	handleError(db.AutoMigrate(&books.Page{}))
-	handleError(db.AutoMigrate(&books.AudioBook{}))
+	handleError(db.AutoMigrate(&books.BookAudio{}))
+	handleError(db.AutoMigrate(&books.BookPage{}))
 	handleError(db.AutoMigrate(&books.Book{}))
 }

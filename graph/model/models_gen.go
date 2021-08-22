@@ -2,14 +2,6 @@
 
 package model
 
-type AudioBook struct {
-	CreatedBy    *User  `json:"createdBy"`
-	Book         *Book  `json:"book"`
-	CursorStarts int    `json:"cursorStarts"`
-	CursorEnds   int    `json:"cursorEnds"`
-	CreatedAt    string `json:"createdAt"`
-}
-
 type Author struct {
 	Name       string       `json:"name"`
 	Book       []*Book      `json:"book"`
@@ -20,9 +12,17 @@ type Book struct {
 	Name      string       `json:"name"`
 	Author    *Author      `json:"author"`
 	Publisher *Publisher   `json:"publisher"`
-	Audios    []*AudioBook `json:"audios"`
+	Audios    []*BookAudio `json:"audios"`
 	Pages     []*BookPage  `json:"pages"`
 	CreatedAt string       `json:"createdAt"`
+}
+
+type BookAudio struct {
+	CreatedBy    *User  `json:"createdBy"`
+	Book         *Book  `json:"book"`
+	CursorStarts int    `json:"cursorStarts"`
+	CursorEnds   int    `json:"cursorEnds"`
+	CreatedAt    string `json:"createdAt"`
 }
 
 type BookPage struct {

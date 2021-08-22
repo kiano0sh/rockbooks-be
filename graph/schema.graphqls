@@ -34,7 +34,7 @@ type Publisher {
   authors: [Author!]
 }
 
-type AudioBook {
+type BookAudio {
   createdBy: User!
   book: Book!
   cursorStarts: Int!
@@ -51,7 +51,7 @@ type Book {
   name: String!
   author: Author!
   publisher: Publisher!
-  audios: [AudioBook!]
+  audios: [BookAudio!]
   pages: [BookPage!]
   createdAt: String!
 }
