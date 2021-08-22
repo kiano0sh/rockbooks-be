@@ -55,7 +55,6 @@ type ComplexityRoot struct {
 		Book       func(childComplexity int) int
 		Name       func(childComplexity int) int
 		Publishers func(childComplexity int) int
-		Surname    func(childComplexity int) int
 	}
 
 	Book struct {
@@ -186,13 +185,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Author.Publishers(childComplexity), true
-
-	case "Author.surname":
-		if e.complexity.Author.Surname == nil {
-			break
-		}
-
-		return e.complexity.Author.Surname(childComplexity), true
 
 	case "Book.audios":
 		if e.complexity.Book.Audios == nil {
@@ -482,7 +474,6 @@ type User {
 
 type Author {
   name: String!
-  surname: String!
   book: [Book!]
   publishers: [Publisher!]
 }
@@ -874,41 +865,6 @@ func (ec *executionContext) _Author_name(ctx context.Context, field graphql.Coll
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Author_surname(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Author",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Surname, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3157,11 +3113,6 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = graphql.MarshalString("Author")
 		case "name":
 			out.Values[i] = ec._Author_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "surname":
-			out.Values[i] = ec._Author_surname(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

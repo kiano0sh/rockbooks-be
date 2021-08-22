@@ -12,7 +12,6 @@ type AudioBook struct {
 
 type Author struct {
 	Name       string       `json:"name"`
-	Surname    string       `json:"surname"`
 	Book       []*Book      `json:"book"`
 	Publishers []*Publisher `json:"publishers"`
 }

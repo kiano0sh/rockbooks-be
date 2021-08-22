@@ -24,7 +24,6 @@ type User {
 
 type Author {
   name: String!
-  surname: String!
   book: [Book!]
   publishers: [Publisher!]
 }
