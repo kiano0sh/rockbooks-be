@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"gitlab.com/kian00sh/rockbooks-be/src/users"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gorm.io/gorm"
 )
 

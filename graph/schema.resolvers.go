@@ -9,8 +9,8 @@ import (
 
 	"gitlab.com/kian00sh/rockbooks-be/graph/generated"
 	"gitlab.com/kian00sh/rockbooks-be/graph/model"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
-	"gitlab.com/kian00sh/rockbooks-be/src/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
 )
 

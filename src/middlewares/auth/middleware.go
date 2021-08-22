@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
-	"gitlab.com/kian00sh/rockbooks-be/src/users"
 )
 
 var userCtxKey = &contextKey{"user"}
