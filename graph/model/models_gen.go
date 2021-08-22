@@ -19,6 +19,7 @@ type Book struct {
 
 type BookAudio struct {
 	CreatedBy    *User  `json:"createdBy"`
+	Audio        string `json:"audio"`
 	Book         *Book  `json:"book"`
 	CursorStarts int    `json:"cursorStarts"`
 	CursorEnds   int    `json:"cursorEnds"`
@@ -28,6 +29,35 @@ type BookAudio struct {
 type BookPage struct {
 	Content    string `json:"content"`
 	PageNumber int    `json:"pageNumber"`
+}
+
+type CreateAuthorInput struct {
+	Name         string   `json:"name"`
+	PublisherIds []string `json:"publisherIds"`
+}
+
+type CreateBookAudioInput struct {
+	Audio        string `json:"audio"`
+	BookID       string `json:"bookId"`
+	CursorStarts int    `json:"cursorStarts"`
+	CursorEnds   int    `json:"cursorEnds"`
+}
+
+type CreateBookInput struct {
+	Name        string `json:"name"`
+	AuthorID    string `json:"authorId"`
+	PublisherID string `json:"publisherId"`
+}
+
+type CreateBookPageInput struct {
+	BookID     string `json:"bookId"`
+	Content    string `json:"content"`
+	PageNumber int    `json:"pageNumber"`
+}
+
+type CreatePublisherInput struct {
+	Name      string   `json:"name"`
+	AuthorIds []string `json:"authorIds"`
 }
 
 type LoginInput struct {
@@ -49,6 +79,40 @@ type RegisterInput struct {
 	DisplayName string `json:"displayName"`
 	Email       string `json:"email"`
 	Password    string `json:"password"`
+}
+
+type UpdateAuthorInput struct {
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	PublisherIds []string `json:"publisherIds"`
+}
+
+type UpdateBookAudioInput struct {
+	ID           string `json:"id"`
+	Audio        string `json:"audio"`
+	BookID       string `json:"bookId"`
+	CursorStarts int    `json:"cursorStarts"`
+	CursorEnds   int    `json:"cursorEnds"`
+}
+
+type UpdateBookInput struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	AuthorID    string `json:"authorId"`
+	PublisherID string `json:"publisherId"`
+}
+
+type UpdateBookPageInput struct {
+	ID         string `json:"id"`
+	BookID     string `json:"bookId"`
+	Content    string `json:"content"`
+	PageNumber int    `json:"pageNumber"`
+}
+
+type UpdatePublisherInput struct {
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	AuthorIds []string `json:"authorIds"`
 }
 
 type User struct {

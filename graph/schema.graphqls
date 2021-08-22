@@ -14,46 +14,28 @@ type Mutation {
   register(input: RegisterInput!): String!
   login(input: LoginInput!): String!
   refreshToken(input: RefreshTokenInput!): String!
+  createBook(input: CreateBookInput!): Book!
+  updateBook(input: UpdateBookInput!): Book!
+  deleteBook(id: ID!): Boolean!
+  createBookPage(input: CreateBookPageInput!): BookPage!
+  updateBookPage(input: UpdateBookPageInput!): BookPage!
+  deleteBookPage(id: ID!): Boolean!
+  createBookAudio(input: CreateBookAudioInput!): BookAudio!
+  updateBookAudio(input: UpdateBookAudioInput!): BookAudio!
+  deleteBookAudio(id: ID!): Boolean!
+  createAuthor(input: CreateAuthorInput!): Author!
+  updateAuthor(input: UpdateAuthorInput!): Author!
+  deleteAuthor(id: ID!): Boolean!
+  createPublisher(input: CreatePublisherInput!): Publisher!
+  updatePublisher(input: UpdatePublisherInput!): Publisher!
+  deletePublisher(id: ID!): Boolean!
 }
 
+# Users
 type User {
   displayName: String!
   email: String!
   avatar: String
-}
-
-type Author {
-  name: String!
-  book: [Book!]
-  publishers: [Publisher!]
-}
-
-type Publisher {
-  name: String!
-  book: [Book!]
-  authors: [Author!]
-}
-
-type BookAudio {
-  createdBy: User!
-  book: Book!
-  cursorStarts: Int!
-  cursorEnds: Int!
-  createdAt: String!
-}
-
-type BookPage {
-  content: String!
-  pageNumber: Int!
-}
-
-type Book {
-  name: String!
-  author: Author!
-  publisher: Publisher!
-  audios: [BookAudio!]
-  pages: [BookPage!]
-  createdAt: String!
 }
 
 input RegisterInput {
@@ -69,4 +51,107 @@ input LoginInput {
 
 input RefreshTokenInput {
   token: String!
+}
+
+# Authors
+type Author {
+  name: String!
+  book: [Book!]
+  publishers: [Publisher!]
+}
+
+input CreateAuthorInput {
+  name: String!
+  publisherIds: [ID!]
+}
+
+input UpdateAuthorInput {
+  id: ID!
+  name: String!
+  publisherIds: [ID!]
+}
+
+# Publishers
+type Publisher {
+  name: String!
+  book: [Book!]
+  authors: [Author!]
+}
+
+input CreatePublisherInput {
+  name: String!
+  authorIds: [ID!]
+}
+
+input UpdatePublisherInput {
+  id: ID!
+  name: String!
+  authorIds: [ID!]
+}
+
+# BookAudios
+type BookAudio {
+  createdBy: User!
+  audio: String!
+  book: Book!
+  cursorStarts: Int!
+  cursorEnds: Int!
+  createdAt: String!
+}
+
+input CreateBookAudioInput {
+  audio: String!
+  bookId: ID!
+  cursorStarts: Int!
+  cursorEnds: Int!
+}
+
+input UpdateBookAudioInput {
+  id: ID!
+  audio: String!
+  bookId: ID!
+  cursorStarts: Int!
+  cursorEnds: Int!
+}
+
+# BookPages
+type BookPage {
+  content: String!
+  pageNumber: Int!
+}
+
+input CreateBookPageInput {
+  bookId: ID!
+  content: String!
+  pageNumber: Int!
+}
+
+input UpdateBookPageInput {
+  id: ID!
+  bookId: ID!
+  content: String!
+  pageNumber: Int!
+}
+
+# Books
+type Book {
+  name: String!
+  author: Author!
+  publisher: Publisher!
+  audios: [BookAudio!]
+  pages: [BookPage!]
+  createdAt: String!
+}
+
+input CreateBookInput {
+  name: String!
+  authorId: ID!
+  publisherId: ID!
+}
+
+input UpdateBookInput {
+  id: ID!
+  name: String!
+  authorId: ID!
+  publisherId: ID!
 }

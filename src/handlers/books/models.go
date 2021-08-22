@@ -20,6 +20,7 @@ type Publisher struct {
 
 type BookAudio struct {
 	gorm.Model
+	Audio        string `gorm:"size:256"`
 	UserID       uint
 	BookID       uint
 	CursorStarts uint
