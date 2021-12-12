@@ -14,7 +14,7 @@ func (user *User) Register() error {
 	user.Password = hashedPassword
 	result := database.DB.Create(&user)
 	if result.Error != nil {
-		return grapherrors.ReturnGQLError("You might have already signed up with this email!", result.Error)
+		return grapherrors.ReturnGQLError("شما قبلا ثبت نام کرده اید", result.Error)
 	}
 	return nil
 }
