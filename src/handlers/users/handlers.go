@@ -23,11 +23,11 @@ func (user *User) Authenticate() error {
 	var userResult *User
 	result := database.DB.Where("email = ?", user.Email).First(&userResult)
 	if result.Error != nil {
-		return grapherrors.ReturnGQLError("Credentials are wrong!", result.Error)
+		return grapherrors.ReturnGQLError("نام کاربری یا رمز عبور صحیح نیست", result.Error)
 	}
 	passwordIsOk := CheckPassword(userResult.Password, user.Password)
 	if !passwordIsOk {
-		return grapherrors.ReturnGQLError("Credentials are wrong!", result.Error)
+		return grapherrors.ReturnGQLError("نام کاربری یا رمز عبور صحیح نیست", result.Error)
 	}
 	return nil
 }
