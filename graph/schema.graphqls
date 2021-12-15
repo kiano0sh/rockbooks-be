@@ -1,3 +1,5 @@
+scalar Upload
+
 # Queries definition
 type Query {
   self: User!
@@ -17,9 +19,6 @@ type Mutation {
   createBook(input: CreateBookInput!): Book!
   updateBook(input: UpdateBookInput!): Book!
   deleteBook(id: ID!): Boolean!
-  createBookPage(input: CreateBookPageInput!): BookPage!
-  updateBookPage(input: UpdateBookPageInput!): BookPage!
-  deleteBookPage(id: ID!): Boolean!
   createBookAudio(input: CreateBookAudioInput!): BookAudio!
   updateBookAudio(input: UpdateBookAudioInput!): BookAudio!
   deleteBookAudio(id: ID!): Boolean!
@@ -120,19 +119,6 @@ type BookPage {
   pageNumber: Int!
 }
 
-input CreateBookPageInput {
-  bookId: ID!
-  content: String!
-  pageNumber: Int!
-}
-
-input UpdateBookPageInput {
-  id: ID!
-  bookId: ID!
-  content: String!
-  pageNumber: Int!
-}
-
 # Books
 type Book {
   name: String!
@@ -147,6 +133,7 @@ input CreateBookInput {
   name: String!
   authorId: ID!
   publisherId: ID!
+  bookFile: Upload!
 }
 
 input UpdateBookInput {

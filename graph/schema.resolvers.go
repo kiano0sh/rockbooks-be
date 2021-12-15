@@ -69,18 +69,6 @@ func (r *mutationResolver) DeleteBook(ctx context.Context, id string) (bool, err
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateBookPage(ctx context.Context, input model.CreateBookPageInput) (*model.BookPage, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) UpdateBookPage(ctx context.Context, input model.UpdateBookPageInput) (*model.BookPage, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *mutationResolver) DeleteBookPage(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *mutationResolver) CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*model.BookAudio, error) {
 	panic(fmt.Errorf("not implemented"))
 }

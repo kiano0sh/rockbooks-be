@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type Author struct {
 	Name       string       `json:"name"`
 	Book       []*Book      `json:"book"`
@@ -44,15 +48,10 @@ type CreateBookAudioInput struct {
 }
 
 type CreateBookInput struct {
-	Name        string `json:"name"`
-	AuthorID    string `json:"authorId"`
-	PublisherID string `json:"publisherId"`
-}
-
-type CreateBookPageInput struct {
-	BookID     string `json:"bookId"`
-	Content    string `json:"content"`
-	PageNumber int    `json:"pageNumber"`
+	Name        string         `json:"name"`
+	AuthorID    string         `json:"authorId"`
+	PublisherID string         `json:"publisherId"`
+	BookFile    graphql.Upload `json:"bookFile"`
 }
 
 type CreatePublisherInput struct {
@@ -100,13 +99,6 @@ type UpdateBookInput struct {
 	Name        string `json:"name"`
 	AuthorID    string `json:"authorId"`
 	PublisherID string `json:"publisherId"`
-}
-
-type UpdateBookPageInput struct {
-	ID         string `json:"id"`
-	BookID     string `json:"bookId"`
-	Content    string `json:"content"`
-	PageNumber int    `json:"pageNumber"`
 }
 
 type UpdatePublisherInput struct {

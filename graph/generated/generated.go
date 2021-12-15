@@ -76,12 +76,10 @@ type ComplexityRoot struct {
 		CreateAuthor    func(childComplexity int, input model.CreateAuthorInput) int
 		CreateBook      func(childComplexity int, input model.CreateBookInput) int
 		CreateBookAudio func(childComplexity int, input model.CreateBookAudioInput) int
-		CreateBookPage  func(childComplexity int, input model.CreateBookPageInput) int
 		CreatePublisher func(childComplexity int, input model.CreatePublisherInput) int
 		DeleteAuthor    func(childComplexity int, id string) int
 		DeleteBook      func(childComplexity int, id string) int
 		DeleteBookAudio func(childComplexity int, id string) int
-		DeleteBookPage  func(childComplexity int, id string) int
 		DeletePublisher func(childComplexity int, id string) int
 		Login           func(childComplexity int, input model.LoginInput) int
 		RefreshToken    func(childComplexity int, input model.RefreshTokenInput) int
@@ -89,7 +87,6 @@ type ComplexityRoot struct {
 		UpdateAuthor    func(childComplexity int, input model.UpdateAuthorInput) int
 		UpdateBook      func(childComplexity int, input model.UpdateBookInput) int
 		UpdateBookAudio func(childComplexity int, input model.UpdateBookAudioInput) int
-		UpdateBookPage  func(childComplexity int, input model.UpdateBookPageInput) int
 		UpdatePublisher func(childComplexity int, input model.UpdatePublisherInput) int
 	}
 
@@ -123,9 +120,6 @@ type MutationResolver interface {
 	CreateBook(ctx context.Context, input model.CreateBookInput) (*model.Book, error)
 	UpdateBook(ctx context.Context, input model.UpdateBookInput) (*model.Book, error)
 	DeleteBook(ctx context.Context, id string) (bool, error)
-	CreateBookPage(ctx context.Context, input model.CreateBookPageInput) (*model.BookPage, error)
-	UpdateBookPage(ctx context.Context, input model.UpdateBookPageInput) (*model.BookPage, error)
-	DeleteBookPage(ctx context.Context, id string) (bool, error)
 	CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*model.BookAudio, error)
 	UpdateBookAudio(ctx context.Context, input model.UpdateBookAudioInput) (*model.BookAudio, error)
 	DeleteBookAudio(ctx context.Context, id string) (bool, error)
@@ -316,18 +310,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateBookAudio(childComplexity, args["input"].(model.CreateBookAudioInput)), true
 
-	case "Mutation.createBookPage":
-		if e.complexity.Mutation.CreateBookPage == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createBookPage_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateBookPage(childComplexity, args["input"].(model.CreateBookPageInput)), true
-
 	case "Mutation.createPublisher":
 		if e.complexity.Mutation.CreatePublisher == nil {
 			break
@@ -375,18 +357,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteBookAudio(childComplexity, args["id"].(string)), true
-
-	case "Mutation.deleteBookPage":
-		if e.complexity.Mutation.DeleteBookPage == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteBookPage_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteBookPage(childComplexity, args["id"].(string)), true
 
 	case "Mutation.deletePublisher":
 		if e.complexity.Mutation.DeletePublisher == nil {
@@ -471,18 +441,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateBookAudio(childComplexity, args["input"].(model.UpdateBookAudioInput)), true
-
-	case "Mutation.updateBookPage":
-		if e.complexity.Mutation.UpdateBookPage == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateBookPage_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateBookPage(childComplexity, args["input"].(model.UpdateBookPageInput)), true
 
 	case "Mutation.updatePublisher":
 		if e.complexity.Mutation.UpdatePublisher == nil {
@@ -666,7 +624,9 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "graph/schema.graphqls", Input: `# Queries definition
+	{Name: "graph/schema.graphqls", Input: `scalar Upload
+
+# Queries definition
 type Query {
   self: User!
   authors: [Author]
@@ -685,9 +645,9 @@ type Mutation {
   createBook(input: CreateBookInput!): Book!
   updateBook(input: UpdateBookInput!): Book!
   deleteBook(id: ID!): Boolean!
-  createBookPage(input: CreateBookPageInput!): BookPage!
-  updateBookPage(input: UpdateBookPageInput!): BookPage!
-  deleteBookPage(id: ID!): Boolean!
+  # createBookPage(input: CreateBookPageInput!): BookPage!
+  # updateBookPage(input: UpdateBookPageInput!): BookPage!
+  # deleteBookPage(id: ID!): Boolean!
   createBookAudio(input: CreateBookAudioInput!): BookAudio!
   updateBookAudio(input: UpdateBookAudioInput!): BookAudio!
   deleteBookAudio(id: ID!): Boolean!
@@ -788,18 +748,18 @@ type BookPage {
   pageNumber: Int!
 }
 
-input CreateBookPageInput {
-  bookId: ID!
-  content: String!
-  pageNumber: Int!
-}
+# input CreateBookPageInput {
+#   bookId: ID!
+#   content: String!
+#   pageNumber: Int!
+# }
 
-input UpdateBookPageInput {
-  id: ID!
-  bookId: ID!
-  content: String!
-  pageNumber: Int!
-}
+# input UpdateBookPageInput {
+#   id: ID!
+#   bookId: ID!
+#   content: String!
+#   pageNumber: Int!
+# }
 
 # Books
 type Book {
@@ -815,6 +775,7 @@ input CreateBookInput {
   name: String!
   authorId: ID!
   publisherId: ID!
+  bookFile: Upload!
 }
 
 input UpdateBookInput {
@@ -853,21 +814,6 @@ func (ec *executionContext) field_Mutation_createBookAudio_args(ctx context.Cont
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateBookAudioInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐCreateBookAudioInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createBookPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.CreateBookPageInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateBookPageInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐCreateBookPageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -922,21 +868,6 @@ func (ec *executionContext) field_Mutation_deleteAuthor_args(ctx context.Context
 }
 
 func (ec *executionContext) field_Mutation_deleteBookAudio_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteBookPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1048,21 +979,6 @@ func (ec *executionContext) field_Mutation_updateBookAudio_args(ctx context.Cont
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNUpdateBookAudioInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUpdateBookAudioInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateBookPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.UpdateBookPageInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUpdateBookPageInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUpdateBookPageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2018,132 +1934,6 @@ func (ec *executionContext) _Mutation_deleteBook(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteBook(rctx, args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_createBookPage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_createBookPage_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateBookPage(rctx, args["input"].(model.CreateBookPageInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.BookPage)
-	fc.Result = res
-	return ec.marshalNBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_updateBookPage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateBookPage_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateBookPage(rctx, args["input"].(model.UpdateBookPageInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.BookPage)
-	fc.Result = res
-	return ec.marshalNBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_deleteBookPage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_deleteBookPage_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteBookPage(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4256,39 +4046,11 @@ func (ec *executionContext) unmarshalInputCreateBookInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputCreateBookPageInput(ctx context.Context, obj interface{}) (model.CreateBookPageInput, error) {
-	var it model.CreateBookPageInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "bookId":
+		case "bookFile":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bookId"))
-			it.BookID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "content":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
-			it.Content, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pageNumber":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageNumber"))
-			it.PageNumber, err = ec.unmarshalNInt2int(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bookFile"))
+			it.BookFile, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4533,50 +4295,6 @@ func (ec *executionContext) unmarshalInputUpdateBookInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("publisherId"))
 			it.PublisherID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUpdateBookPageInput(ctx context.Context, obj interface{}) (model.UpdateBookPageInput, error) {
-	var it model.UpdateBookPageInput
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "bookId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bookId"))
-			it.BookID, err = ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "content":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
-			it.Content, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pageNumber":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageNumber"))
-			it.PageNumber, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4833,21 +4551,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deleteBook":
 			out.Values[i] = ec._Mutation_deleteBook(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createBookPage":
-			out.Values[i] = ec._Mutation_createBookPage(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "updateBookPage":
-			out.Values[i] = ec._Mutation_updateBookPage(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "deleteBookPage":
-			out.Values[i] = ec._Mutation_deleteBookPage(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -5378,10 +5081,6 @@ func (ec *executionContext) marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockb
 	return ec._BookAudio(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNBookPage2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx context.Context, sel ast.SelectionSet, v model.BookPage) graphql.Marshaler {
-	return ec._BookPage(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx context.Context, sel ast.SelectionSet, v *model.BookPage) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -5419,11 +5118,6 @@ func (ec *executionContext) unmarshalNCreateBookAudioInput2gitlabᚗcomᚋkian00
 
 func (ec *executionContext) unmarshalNCreateBookInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐCreateBookInput(ctx context.Context, v interface{}) (model.CreateBookInput, error) {
 	res, err := ec.unmarshalInputCreateBookInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNCreateBookPageInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐCreateBookPageInput(ctx context.Context, v interface{}) (model.CreateBookPageInput, error) {
-	res, err := ec.unmarshalInputCreateBookPageInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5521,14 +5215,24 @@ func (ec *executionContext) unmarshalNUpdateBookInput2gitlabᚗcomᚋkian00shᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNUpdateBookPageInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUpdateBookPageInput(ctx context.Context, v interface{}) (model.UpdateBookPageInput, error) {
-	res, err := ec.unmarshalInputUpdateBookPageInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNUpdatePublisherInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUpdatePublisherInput(ctx context.Context, v interface{}) (model.UpdatePublisherInput, error) {
 	res, err := ec.unmarshalInputUpdatePublisherInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
+	res, err := graphql.UnmarshalUpload(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	res := graphql.MarshalUpload(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNUser2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
