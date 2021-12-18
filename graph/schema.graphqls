@@ -55,37 +55,31 @@ input RefreshTokenInput {
 # Authors
 type Author {
   name: String!
-  book: [Book!]
-  publishers: [Publisher!]
+  books: [Book!]
 }
 
 input CreateAuthorInput {
   name: String!
-  publisherIds: [ID!]
 }
 
 input UpdateAuthorInput {
   id: ID!
   name: String!
-  publisherIds: [ID!]
 }
 
 # Publishers
 type Publisher {
   name: String!
-  book: [Book!]
-  authors: [Author!]
+  books: [Book!]
 }
 
 input CreatePublisherInput {
   name: String!
-  authorIds: [ID!]
 }
 
 input UpdatePublisherInput {
   id: ID!
   name: String!
-  authorIds: [ID!]
 }
 
 # BookAudios

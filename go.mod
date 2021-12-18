@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/99designs/gqlgen v0.13.0
+	github.com/gen2brain/go-fitz v1.18.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/rs/cors v1.8.0 // indirect

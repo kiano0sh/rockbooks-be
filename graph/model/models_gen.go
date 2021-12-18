@@ -7,9 +7,8 @@ import (
 )
 
 type Author struct {
-	Name       string       `json:"name"`
-	Book       []*Book      `json:"book"`
-	Publishers []*Publisher `json:"publishers"`
+	Name  string  `json:"name"`
+	Books []*Book `json:"books"`
 }
 
 type Book struct {
@@ -36,8 +35,7 @@ type BookPage struct {
 }
 
 type CreateAuthorInput struct {
-	Name         string   `json:"name"`
-	PublisherIds []string `json:"publisherIds"`
+	Name string `json:"name"`
 }
 
 type CreateBookAudioInput struct {
@@ -55,8 +53,7 @@ type CreateBookInput struct {
 }
 
 type CreatePublisherInput struct {
-	Name      string   `json:"name"`
-	AuthorIds []string `json:"authorIds"`
+	Name string `json:"name"`
 }
 
 type LoginInput struct {
@@ -65,9 +62,8 @@ type LoginInput struct {
 }
 
 type Publisher struct {
-	Name    string    `json:"name"`
-	Book    []*Book   `json:"book"`
-	Authors []*Author `json:"authors"`
+	Name  string  `json:"name"`
+	Books []*Book `json:"books"`
 }
 
 type RefreshTokenInput struct {
@@ -81,9 +77,8 @@ type RegisterInput struct {
 }
 
 type UpdateAuthorInput struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	PublisherIds []string `json:"publisherIds"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type UpdateBookAudioInput struct {
@@ -102,9 +97,8 @@ type UpdateBookInput struct {
 }
 
 type UpdatePublisherInput struct {
-	ID        string   `json:"id"`
-	Name      string   `json:"name"`
-	AuthorIds []string `json:"authorIds"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
 type User struct {

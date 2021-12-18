@@ -9,6 +9,7 @@ import (
 
 	"gitlab.com/kian00sh/rockbooks-be/graph/generated"
 	"gitlab.com/kian00sh/rockbooks-be/graph/model"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/books"
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
@@ -58,6 +59,9 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 }
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBookInput) (*model.Book, error) {
+	var book books.Book
+	book.BookFile = input.BookFile
+	book.CreateBook()
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -82,7 +86,13 @@ func (r *mutationResolver) DeleteBookAudio(ctx context.Context, id string) (bool
 }
 
 func (r *mutationResolver) CreateAuthor(ctx context.Context, input model.CreateAuthorInput) (*model.Author, error) {
-	panic(fmt.Errorf("not implemented"))
+	var author books.Author
+	author.Name = input.Name
+	createdAuthor, err := author.CreateAuthor()
+	if err != nil {
+		return nil, err
+	}
+	return createdAuthor, nil
 }
 
 func (r *mutationResolver) UpdateAuthor(ctx context.Context, input model.UpdateAuthorInput) (*model.Author, error) {

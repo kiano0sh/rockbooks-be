@@ -1,21 +1,20 @@
 package books
 
 import (
+	"github.com/99designs/gqlgen/graphql"
 	"gorm.io/gorm"
 )
 
 type Author struct {
 	gorm.Model
-	Name       string      `gorm:"size:128;uniqueIndex"`
-	Publishers []Publisher `gorm:"many2many:author_publishers;"`
-	Books      []Book
+	Name  string `gorm:"size:128;uniqueIndex"`
+	Books []Book
 }
 
 type Publisher struct {
 	gorm.Model
-	Name    string      `gorm:"size:128;uniqueIndex"`
-	Authors []Publisher `gorm:"many2many:author_publishers;"`
-	Books   []Book
+	Name  string `gorm:"size:128;uniqueIndex"`
+	Books []Book
 }
 
 type BookAudio struct {
@@ -41,4 +40,5 @@ type Book struct {
 	AudioBooks  []BookAudio
 	AuthorID    uint
 	PublisherID uint
+	BookFile    graphql.Upload `gorm:"-"`
 }

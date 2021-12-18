@@ -44,9 +44,8 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Author struct {
-		Book       func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Publishers func(childComplexity int) int
+		Books func(childComplexity int) int
+		Name  func(childComplexity int) int
 	}
 
 	Book struct {
@@ -91,9 +90,8 @@ type ComplexityRoot struct {
 	}
 
 	Publisher struct {
-		Authors func(childComplexity int) int
-		Book    func(childComplexity int) int
-		Name    func(childComplexity int) int
+		Books func(childComplexity int) int
+		Name  func(childComplexity int) int
 	}
 
 	Query struct {
@@ -155,12 +153,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Author.book":
-		if e.complexity.Author.Book == nil {
+	case "Author.books":
+		if e.complexity.Author.Books == nil {
 			break
 		}
 
-		return e.complexity.Author.Book(childComplexity), true
+		return e.complexity.Author.Books(childComplexity), true
 
 	case "Author.name":
 		if e.complexity.Author.Name == nil {
@@ -168,13 +166,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Author.Name(childComplexity), true
-
-	case "Author.publishers":
-		if e.complexity.Author.Publishers == nil {
-			break
-		}
-
-		return e.complexity.Author.Publishers(childComplexity), true
 
 	case "Book.audios":
 		if e.complexity.Book.Audios == nil {
@@ -454,19 +445,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdatePublisher(childComplexity, args["input"].(model.UpdatePublisherInput)), true
 
-	case "Publisher.authors":
-		if e.complexity.Publisher.Authors == nil {
+	case "Publisher.books":
+		if e.complexity.Publisher.Books == nil {
 			break
 		}
 
-		return e.complexity.Publisher.Authors(childComplexity), true
-
-	case "Publisher.book":
-		if e.complexity.Publisher.Book == nil {
-			break
-		}
-
-		return e.complexity.Publisher.Book(childComplexity), true
+		return e.complexity.Publisher.Books(childComplexity), true
 
 	case "Publisher.name":
 		if e.complexity.Publisher.Name == nil {
@@ -645,9 +629,6 @@ type Mutation {
   createBook(input: CreateBookInput!): Book!
   updateBook(input: UpdateBookInput!): Book!
   deleteBook(id: ID!): Boolean!
-  # createBookPage(input: CreateBookPageInput!): BookPage!
-  # updateBookPage(input: UpdateBookPageInput!): BookPage!
-  # deleteBookPage(id: ID!): Boolean!
   createBookAudio(input: CreateBookAudioInput!): BookAudio!
   updateBookAudio(input: UpdateBookAudioInput!): BookAudio!
   deleteBookAudio(id: ID!): Boolean!
@@ -684,37 +665,31 @@ input RefreshTokenInput {
 # Authors
 type Author {
   name: String!
-  book: [Book!]
-  publishers: [Publisher!]
+  books: [Book!]
 }
 
 input CreateAuthorInput {
   name: String!
-  publisherIds: [ID!]
 }
 
 input UpdateAuthorInput {
   id: ID!
   name: String!
-  publisherIds: [ID!]
 }
 
 # Publishers
 type Publisher {
   name: String!
-  book: [Book!]
-  authors: [Author!]
+  books: [Book!]
 }
 
 input CreatePublisherInput {
   name: String!
-  authorIds: [ID!]
 }
 
 input UpdatePublisherInput {
   id: ID!
   name: String!
-  authorIds: [ID!]
 }
 
 # BookAudios
@@ -747,19 +722,6 @@ type BookPage {
   content: String!
   pageNumber: Int!
 }
-
-# input CreateBookPageInput {
-#   bookId: ID!
-#   content: String!
-#   pageNumber: Int!
-# }
-
-# input UpdateBookPageInput {
-#   id: ID!
-#   bookId: ID!
-#   content: String!
-#   pageNumber: Int!
-# }
 
 # Books
 type Book {
@@ -1150,7 +1112,7 @@ func (ec *executionContext) _Author_name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Author_book(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_books(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1168,7 +1130,7 @@ func (ec *executionContext) _Author_book(ctx context.Context, field graphql.Coll
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Book, nil
+		return obj.Books, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1180,38 +1142,6 @@ func (ec *executionContext) _Author_book(ctx context.Context, field graphql.Coll
 	res := resTmp.([]*model.Book)
 	fc.Result = res
 	return ec.marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Author_publishers(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Author",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Publishers, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Publisher)
-	fc.Result = res
-	return ec.marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisherᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Book_name(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
@@ -2363,7 +2293,7 @@ func (ec *executionContext) _Publisher_name(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Publisher_book(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
+func (ec *executionContext) _Publisher_books(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2381,7 +2311,7 @@ func (ec *executionContext) _Publisher_book(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Book, nil
+		return obj.Books, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2393,38 +2323,6 @@ func (ec *executionContext) _Publisher_book(ctx context.Context, field graphql.C
 	res := resTmp.([]*model.Book)
 	fc.Result = res
 	return ec.marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Publisher_authors(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Publisher",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Authors, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Author)
-	fc.Result = res
-	return ec.marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthorᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_self(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3958,14 +3856,6 @@ func (ec *executionContext) unmarshalInputCreateAuthorInput(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
-		case "publisherIds":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("publisherIds"))
-			it.PublisherIds, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		}
 	}
 
@@ -4071,14 +3961,6 @@ func (ec *executionContext) unmarshalInputCreatePublisherInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "authorIds":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorIds"))
-			it.AuthorIds, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4191,14 +4073,6 @@ func (ec *executionContext) unmarshalInputUpdateAuthorInput(ctx context.Context,
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			it.Name, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "publisherIds":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("publisherIds"))
-			it.PublisherIds, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4326,14 +4200,6 @@ func (ec *executionContext) unmarshalInputUpdatePublisherInput(ctx context.Conte
 			if err != nil {
 				return it, err
 			}
-		case "authorIds":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorIds"))
-			it.AuthorIds, err = ec.unmarshalOID2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		}
 	}
 
@@ -4364,10 +4230,8 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "book":
-			out.Values[i] = ec._Author_book(ctx, field, obj)
-		case "publishers":
-			out.Values[i] = ec._Author_publishers(ctx, field, obj)
+		case "books":
+			out.Values[i] = ec._Author_books(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4626,10 +4490,8 @@ func (ec *executionContext) _Publisher(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "book":
-			out.Values[i] = ec._Publisher_book(ctx, field, obj)
-		case "authors":
-			out.Values[i] = ec._Publisher_authors(ctx, field, obj)
+		case "books":
+			out.Values[i] = ec._Publisher_books(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5518,46 +5380,6 @@ func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockb
 	return ret
 }
 
-func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthorᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Author) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) marshalOAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *model.Author) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5756,42 +5578,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) unmarshalOID2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx context.Context, sel ast.SelectionSet, v []*model.Publisher) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5820,46 +5606,6 @@ func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋro
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalOPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisherᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Publisher) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
