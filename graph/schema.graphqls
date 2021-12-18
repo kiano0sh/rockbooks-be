@@ -54,6 +54,7 @@ input RefreshTokenInput {
 
 # Authors
 type Author {
+  id: ID!
   name: String!
   books: [Book!]
 }
@@ -69,6 +70,7 @@ input UpdateAuthorInput {
 
 # Publishers
 type Publisher {
+  id: ID!
   name: String!
   books: [Book!]
 }

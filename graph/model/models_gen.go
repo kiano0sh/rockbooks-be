@@ -7,6 +7,7 @@ import (
 )
 
 type Author struct {
+	ID    int64   `json:"id"`
 	Name  string  `json:"name"`
 	Books []*Book `json:"books"`
 }
@@ -40,15 +41,15 @@ type CreateAuthorInput struct {
 
 type CreateBookAudioInput struct {
 	Audio        string `json:"audio"`
-	BookID       string `json:"bookId"`
+	BookID       int64  `json:"bookId"`
 	CursorStarts int    `json:"cursorStarts"`
 	CursorEnds   int    `json:"cursorEnds"`
 }
 
 type CreateBookInput struct {
 	Name        string         `json:"name"`
-	AuthorID    string         `json:"authorId"`
-	PublisherID string         `json:"publisherId"`
+	AuthorID    int64          `json:"authorId"`
+	PublisherID int64          `json:"publisherId"`
 	BookFile    graphql.Upload `json:"bookFile"`
 }
 
@@ -62,6 +63,7 @@ type LoginInput struct {
 }
 
 type Publisher struct {
+	ID    int64   `json:"id"`
 	Name  string  `json:"name"`
 	Books []*Book `json:"books"`
 }
@@ -77,27 +79,27 @@ type RegisterInput struct {
 }
 
 type UpdateAuthorInput struct {
-	ID   string `json:"id"`
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
 
 type UpdateBookAudioInput struct {
-	ID           string `json:"id"`
+	ID           int64  `json:"id"`
 	Audio        string `json:"audio"`
-	BookID       string `json:"bookId"`
+	BookID       int64  `json:"bookId"`
 	CursorStarts int    `json:"cursorStarts"`
 	CursorEnds   int    `json:"cursorEnds"`
 }
 
 type UpdateBookInput struct {
-	ID          string `json:"id"`
+	ID          int64  `json:"id"`
 	Name        string `json:"name"`
-	AuthorID    string `json:"authorId"`
-	PublisherID string `json:"publisherId"`
+	AuthorID    int64  `json:"authorId"`
+	PublisherID int64  `json:"publisherId"`
 }
 
 type UpdatePublisherInput struct {
-	ID   string `json:"id"`
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
 

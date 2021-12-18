@@ -60,16 +60,22 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBookInput) (*model.Book, error) {
 	var book books.Book
+	book.Name = input.Name
 	book.BookFile = input.BookFile
-	book.CreateBook()
-	panic(fmt.Errorf("not implemented"))
+	book.AuthorID = input.AuthorID
+	book.PublisherID = input.PublisherID
+	createdBook, err := book.CreateBook()
+	if err != nil {
+		return nil, err
+	}
+	return createdBook, nil
 }
 
 func (r *mutationResolver) UpdateBook(ctx context.Context, input model.UpdateBookInput) (*model.Book, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteBook(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) DeleteBook(ctx context.Context, id int64) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -81,7 +87,7 @@ func (r *mutationResolver) UpdateBookAudio(ctx context.Context, input model.Upda
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteBookAudio(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) DeleteBookAudio(ctx context.Context, id int64) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -99,19 +105,25 @@ func (r *mutationResolver) UpdateAuthor(ctx context.Context, input model.UpdateA
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeleteAuthor(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) DeleteAuthor(ctx context.Context, id int64) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) CreatePublisher(ctx context.Context, input model.CreatePublisherInput) (*model.Publisher, error) {
-	panic(fmt.Errorf("not implemented"))
+	var publisher books.Publisher
+	publisher.Name = input.Name
+	createdPublisher, err := publisher.CreatePublisher()
+	if err != nil {
+		return nil, err
+	}
+	return createdPublisher, nil
 }
 
 func (r *mutationResolver) UpdatePublisher(ctx context.Context, input model.UpdatePublisherInput) (*model.Publisher, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) DeletePublisher(ctx context.Context, id string) (bool, error) {
+func (r *mutationResolver) DeletePublisher(ctx context.Context, id int64) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -123,7 +135,7 @@ func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Author(ctx context.Context, id string) (*model.Author, error) {
+func (r *queryResolver) Author(ctx context.Context, id int64) (*model.Author, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -131,7 +143,7 @@ func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, err
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Publisher(ctx context.Context, id string) (*model.Publisher, error) {
+func (r *queryResolver) Publisher(ctx context.Context, id int64) (*model.Publisher, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -139,7 +151,7 @@ func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Book(ctx context.Context, id string) (*model.Book, error) {
+func (r *queryResolver) Book(ctx context.Context, id int64) (*model.Book, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

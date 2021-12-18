@@ -32,7 +32,7 @@ func (user *User) Authenticate() error {
 	return nil
 }
 
-func GetUserIdByEmail(email string) (uint, error) {
+func GetUserIdByEmail(email string) (int64, error) {
 	var userResult *User
 	result := database.DB.Where("email = ?", email).First(&userResult)
 	if result.Error != nil {

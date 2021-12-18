@@ -7,38 +7,43 @@ import (
 
 type Author struct {
 	gorm.Model
+	ID    int64
 	Name  string `gorm:"size:128;uniqueIndex"`
 	Books []Book
 }
 
 type Publisher struct {
 	gorm.Model
+	ID    int64
 	Name  string `gorm:"size:128;uniqueIndex"`
 	Books []Book
 }
 
 type BookAudio struct {
 	gorm.Model
+	ID           int64
 	Audio        string `gorm:"size:256"`
-	UserID       uint
-	BookID       uint
-	CursorStarts uint
-	CursorEnds   uint
+	UserID       int64
+	BookID       int64
+	CursorStarts int64
+	CursorEnds   int64
 }
 
 type BookPage struct {
 	gorm.Model
+	ID         int64
 	Content    string
 	PageNumber int
-	BookID     uint
+	BookID     int64
 }
 
 type Book struct {
 	gorm.Model
+	ID          int64
 	Name        string `gorm:"size:128"`
 	Pages       []BookPage
 	AudioBooks  []BookAudio
-	AuthorID    uint
-	PublisherID uint
+	AuthorID    int64
+	PublisherID int64
 	BookFile    graphql.Upload `gorm:"-"`
 }
