@@ -1,8 +1,6 @@
 package books
 
 import (
-	"fmt"
-
 	"github.com/gen2brain/go-fitz"
 	"gitlab.com/kian00sh/rockbooks-be/graph/model"
 	database "gitlab.com/kian00sh/rockbooks-be/src/database/postgresql"
@@ -10,21 +8,29 @@ import (
 )
 
 func (book *Book) CreateBook() (*model.Book, error) {
-	doc, err := fitz.NewFromReader(book.BookFile.File)
+	theBook, err := fitz.NewFromReader(book.BookFile.File)
 	if err != nil {
-		panic(err)
+		grapherrors.ReturnGQLError("مشکلی در آغاز فرایند ثبت کتاب پیش آمده است، لطفا مجددا تلاش کنید", err)
 	}
-	defer doc.Close()
-
+	defer theBook.Close()
+	// Collect pages in an array of pages to be used for batch insert
+	var pages []BookPage
 	// Extract pages as text
-	for n := 0; n < doc.NumPage(); n++ {
-		text, err := doc.Text(n)
+	for pageNumber := 0; pageNumber < theBook.NumPage(); pageNumber++ {
+		text, err := theBook.Text(pageNumber)
 		if err != nil {
-			panic(err)
+			// TODO delete the book
+			grapherrors.ReturnGQLError("مشکلی در ثبت صفحات کتاب پیش آمده است، لطفا مجددا تلاش کنید", err)
 		}
-		fmt.Printf(text)
+		pages = append(pages, BookPage{Content: text, PageNumber: pageNumber})
 	}
-	return &model.Book{}, nil
+	book.Pages = pages
+	result := database.DB.Create(&book)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت کتاب پیش آمده است، لطفا مجددا تلاش کنید", result.Error)
+	}
+
+	return &model.Book{Name: book.Name}, nil
 }
 
 func (author *Author) CreateAuthor() (*model.Author, error) {
