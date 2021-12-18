@@ -32,9 +32,5 @@ func (author *Author) CreateAuthor() (*model.Author, error) {
 		return nil, grapherrors.ReturnGQLError("این نویسنده قبلا ثبت شده است", result.Error)
 	}
 	var authorBooks []*model.Book
-	authorBooksResult := database.DB.Where("author_id = ?", author.ID).Find(authorBooks)
-	if authorBooksResult.Error != nil {
-		return nil, grapherrors.ReturnGQLError("در هنگام دیافت کتاب ‌های این نویسنده مشکلی پیش آمد", result.Error)
-	}
 	return &model.Author{Name: author.Name, Books: authorBooks}, nil
 }
