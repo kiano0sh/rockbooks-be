@@ -6,6 +6,8 @@ type Query {
   authors: [Author]
   author(id: ID!): Author!
   publishers: [Publisher]
+  pages(id: ID!, pagination: Pagination): [BookPage]
+  audios(id: ID!): [BookAudio]
   publisher(id: ID!): Publisher!
   books: [Book]
   book(id: ID!): Book!
@@ -28,6 +30,12 @@ type Mutation {
   createPublisher(input: CreatePublisherInput!): Publisher!
   updatePublisher(input: UpdatePublisherInput!): Publisher!
   deletePublisher(id: ID!): Boolean!
+}
+
+# Pagination
+input Pagination {
+  Limit: Int
+  Page: Int
 }
 
 # Users
@@ -120,8 +128,6 @@ type Book {
   name: String!
   author: Author!
   publisher: Publisher!
-  audios: [BookAudio!]
-  pages: [BookPage!]
   createdAt: String!
 }
 

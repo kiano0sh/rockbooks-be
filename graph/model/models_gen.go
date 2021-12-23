@@ -13,12 +13,10 @@ type Author struct {
 }
 
 type Book struct {
-	Name      string       `json:"name"`
-	Author    *Author      `json:"author"`
-	Publisher *Publisher   `json:"publisher"`
-	Audios    []*BookAudio `json:"audios"`
-	Pages     []*BookPage  `json:"pages"`
-	CreatedAt string       `json:"createdAt"`
+	Name      string     `json:"name"`
+	Author    *Author    `json:"author"`
+	Publisher *Publisher `json:"publisher"`
+	CreatedAt string     `json:"createdAt"`
 }
 
 type BookAudio struct {
@@ -60,6 +58,11 @@ type CreatePublisherInput struct {
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type Pagination struct {
+	Limit *int `json:"Limit"`
+	Page  *int `json:"Page"`
 }
 
 type Publisher struct {

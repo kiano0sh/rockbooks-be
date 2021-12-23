@@ -1,11 +1,16 @@
 package books
 
 import (
+	"fmt"
+
 	"github.com/gen2brain/go-fitz"
 	"gitlab.com/kian00sh/rockbooks-be/graph/model"
 	database "gitlab.com/kian00sh/rockbooks-be/src/database/postgresql"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
+	"gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
 )
+
+// Books
 
 func (book *Book) CreateBook() (*model.Book, error) {
 	theBook, err := fitz.NewFromReader(book.BookFile.File)
@@ -29,9 +34,25 @@ func (book *Book) CreateBook() (*model.Book, error) {
 	if result.Error != nil {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت کتاب پیش آمده است، لطفا مجددا تلاش کنید", result.Error)
 	}
-
+	// TODO Fetch the Author from its method and place it in the output
+	// TODO Fetch the Publisher from its method and place it in the output
 	return &model.Book{Name: book.Name}, nil
 }
+
+// Pages
+func (bookPage *BookPage) GetPages() ([]*model.BookPage, error) {
+	fmt.Printf("%d", bookPage.Limit)
+	var pages []*model.BookPage
+	database.DB.Scopes(pagination.Paginate(pages, &pagination.Pagination{PaginationInput: bookPage.PaginationInput}, database.DB)).Find(&pages)
+	// cg.db.Scopes(paginate(categories,&pagination, cg.db)).Find(&categories)
+
+	return nil, nil
+}
+
+// author
+// publisher
+// audios
+// pages
 
 func (author *Author) CreateAuthor() (*model.Author, error) {
 	result := database.DB.Create(&author)

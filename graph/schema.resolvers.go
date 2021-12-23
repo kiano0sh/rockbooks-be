@@ -13,6 +13,7 @@ import (
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
+	mainPagination "gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
 )
 
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (string, error) {
@@ -140,6 +141,21 @@ func (r *queryResolver) Author(ctx context.Context, id int64) (*model.Author, er
 }
 
 func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.Pagination) ([]*model.BookPage, error) {
+	var bookPage books.BookPage
+	bookPage.PaginationInput = mainPagination.PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit}
+	bookPage.BookID = id
+	pages, err := bookPage.GetPages()
+	if err != nil {
+		return nil, err
+	}
+	return pages, nil
+}
+
+func (r *queryResolver) Audios(ctx context.Context, id int64) ([]*model.BookAudio, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

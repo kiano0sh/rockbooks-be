@@ -2,6 +2,7 @@ package books
 
 import (
 	"github.com/99designs/gqlgen/graphql"
+	"gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
 	"gorm.io/gorm"
 )
 
@@ -31,10 +32,11 @@ type BookAudio struct {
 
 type BookPage struct {
 	gorm.Model
-	ID         int64
-	Content    string
-	PageNumber int
-	BookID     int64
+	pagination.PaginationInput `gorm:"-"`
+	ID                         int64
+	Content                    string
+	PageNumber                 int
+	BookID                     int64
 }
 
 type Book struct {
