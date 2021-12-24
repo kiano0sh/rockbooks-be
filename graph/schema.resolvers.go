@@ -149,7 +149,7 @@ func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.P
 	sortStatement := mainPagination.GenerateSortByStatement(pagination.SortBy.String(), pagination.SortOrder.String())
 	bookPage.PaginationInput = mainPagination.PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit, Sort: sortStatement}
 	bookPage.BookID = id
-	pages, paginationResult, err := bookPage.GetPages()
+	pages, paginationResult, err := bookPage.GetBookPages()
 	if err != nil {
 		return nil, err
 	}

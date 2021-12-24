@@ -38,11 +38,11 @@ func (book *Book) CreateBook() (*model.Book, error) {
 }
 
 // Pages
-func (bookPage *BookPage) GetPages() ([]*model.BookPage, *pagination.Pagination, error) {
+func (bookPage *BookPage) GetBookPages() ([]*model.BookPage, *pagination.Pagination, error) {
 	var pages []*model.BookPage
 	var paginationResult pagination.Pagination
 	paginationResult.PaginationInput = bookPage.PaginationInput
-	result := database.DB.Scopes(pagination.Paginate(pages, &paginationResult, database.DB)).Find(&pages)
+	result := database.DB.Scopes(pagination.Paginate(pages, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&pages)
 	if result.Error != nil {
 		return nil, nil, grapherrors.ReturnGQLError("در دریافت صفحات کتاب مشکلی پیش آمده!", result.Error)
 	}
