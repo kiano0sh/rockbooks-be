@@ -144,15 +144,16 @@ func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, err
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.Pagination) ([]*model.BookPage, error) {
+func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.PaginationInput) (*model.BookPagesWithPagination, error) {
 	var bookPage books.BookPage
-	bookPage.PaginationInput = mainPagination.PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit}
+	sortStatement := mainPagination.GenerateSortByStatement(pagination.SortBy.String(), pagination.SortOrder.String())
+	bookPage.PaginationInput = mainPagination.PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit, Sort: sortStatement}
 	bookPage.BookID = id
-	pages, err := bookPage.GetPages()
+	pages, paginationResult, err := bookPage.GetPages()
 	if err != nil {
 		return nil, err
 	}
-	return pages, nil
+	return &model.BookPagesWithPagination{Pagination: &model.PaginationType{Limit: paginationResult.Limit, Page: paginationResult.Page, Total: paginationResult.TotalPages}, BookPages: pages}, nil
 }
 
 func (r *queryResolver) Audios(ctx context.Context, id int64) ([]*model.BookAudio, error) {

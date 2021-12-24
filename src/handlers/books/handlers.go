@@ -1,8 +1,6 @@
 package books
 
 import (
-	"fmt"
-
 	"github.com/gen2brain/go-fitz"
 	"gitlab.com/kian00sh/rockbooks-be/graph/model"
 	database "gitlab.com/kian00sh/rockbooks-be/src/database/postgresql"
@@ -40,13 +38,15 @@ func (book *Book) CreateBook() (*model.Book, error) {
 }
 
 // Pages
-func (bookPage *BookPage) GetPages() ([]*model.BookPage, error) {
-	fmt.Printf("%d", bookPage.Limit)
+func (bookPage *BookPage) GetPages() ([]*model.BookPage, *pagination.Pagination, error) {
 	var pages []*model.BookPage
-	database.DB.Scopes(pagination.Paginate(pages, &pagination.Pagination{PaginationInput: bookPage.PaginationInput}, database.DB)).Find(&pages)
-	// cg.db.Scopes(paginate(categories,&pagination, cg.db)).Find(&categories)
-
-	return nil, nil
+	var paginationResult pagination.Pagination
+	paginationResult.PaginationInput = bookPage.PaginationInput
+	result := database.DB.Scopes(pagination.Paginate(pages, &paginationResult, database.DB)).Find(&pages)
+	if result.Error != nil {
+		return nil, nil, grapherrors.ReturnGQLError("در دریافت صفحات کتاب مشکلی پیش آمده!", result.Error)
+	}
+	return pages, &paginationResult, nil
 }
 
 // author

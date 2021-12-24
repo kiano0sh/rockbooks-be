@@ -70,6 +70,11 @@ type ComplexityRoot struct {
 		PageNumber func(childComplexity int) int
 	}
 
+	BookPagesWithPagination struct {
+		BookPages  func(childComplexity int) int
+		Pagination func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateAuthor    func(childComplexity int, input model.CreateAuthorInput) int
 		CreateBook      func(childComplexity int, input model.CreateBookInput) int
@@ -88,6 +93,12 @@ type ComplexityRoot struct {
 		UpdatePublisher func(childComplexity int, input model.UpdatePublisherInput) int
 	}
 
+	PaginationType struct {
+		Limit func(childComplexity int) int
+		Page  func(childComplexity int) int
+		Total func(childComplexity int) int
+	}
+
 	Publisher struct {
 		Books func(childComplexity int) int
 		ID    func(childComplexity int) int
@@ -100,7 +111,7 @@ type ComplexityRoot struct {
 		Authors    func(childComplexity int) int
 		Book       func(childComplexity int, id int64) int
 		Books      func(childComplexity int) int
-		Pages      func(childComplexity int, id int64, pagination *model.Pagination) int
+		Pages      func(childComplexity int, id int64, pagination *model.PaginationInput) int
 		Publisher  func(childComplexity int, id int64) int
 		Publishers func(childComplexity int) int
 		Self       func(childComplexity int) int
@@ -135,7 +146,7 @@ type QueryResolver interface {
 	Authors(ctx context.Context) ([]*model.Author, error)
 	Author(ctx context.Context, id int64) (*model.Author, error)
 	Publishers(ctx context.Context) ([]*model.Publisher, error)
-	Pages(ctx context.Context, id int64, pagination *model.Pagination) ([]*model.BookPage, error)
+	Pages(ctx context.Context, id int64, pagination *model.PaginationInput) (*model.BookPagesWithPagination, error)
 	Audios(ctx context.Context, id int64) ([]*model.BookAudio, error)
 	Publisher(ctx context.Context, id int64) (*model.Publisher, error)
 	Books(ctx context.Context) ([]*model.Book, error)
@@ -261,6 +272,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.BookPage.PageNumber(childComplexity), true
+
+	case "BookPagesWithPagination.bookPages":
+		if e.complexity.BookPagesWithPagination.BookPages == nil {
+			break
+		}
+
+		return e.complexity.BookPagesWithPagination.BookPages(childComplexity), true
+
+	case "BookPagesWithPagination.pagination":
+		if e.complexity.BookPagesWithPagination.Pagination == nil {
+			break
+		}
+
+		return e.complexity.BookPagesWithPagination.Pagination(childComplexity), true
 
 	case "Mutation.createAuthor":
 		if e.complexity.Mutation.CreateAuthor == nil {
@@ -442,6 +467,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdatePublisher(childComplexity, args["input"].(model.UpdatePublisherInput)), true
 
+	case "PaginationType.limit":
+		if e.complexity.PaginationType.Limit == nil {
+			break
+		}
+
+		return e.complexity.PaginationType.Limit(childComplexity), true
+
+	case "PaginationType.page":
+		if e.complexity.PaginationType.Page == nil {
+			break
+		}
+
+		return e.complexity.PaginationType.Page(childComplexity), true
+
+	case "PaginationType.total":
+		if e.complexity.PaginationType.Total == nil {
+			break
+		}
+
+		return e.complexity.PaginationType.Total(childComplexity), true
+
 	case "Publisher.books":
 		if e.complexity.Publisher.Books == nil {
 			break
@@ -523,7 +569,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Pages(childComplexity, args["id"].(int64), args["pagination"].(*model.Pagination)), true
+		return e.complexity.Query.Pages(childComplexity, args["id"].(int64), args["pagination"].(*model.PaginationInput)), true
 
 	case "Query.publisher":
 		if e.complexity.Query.Publisher == nil {
@@ -644,7 +690,7 @@ type Query {
   authors: [Author]
   author(id: ID!): Author!
   publishers: [Publisher]
-  pages(id: ID!, pagination: Pagination): [BookPage]
+  pages(id: ID!, pagination: PaginationInput): BookPagesWithPagination!
   audios(id: ID!): [BookAudio]
   publisher(id: ID!): Publisher!
   books: [Book]
@@ -670,10 +716,30 @@ type Mutation {
   deletePublisher(id: ID!): Boolean!
 }
 
-# Pagination
-input Pagination {
-  Limit: Int
-  Page: Int
+enum SortOrderEnum {
+  ASC
+  DESC
+}
+
+enum SortByEnum {
+  Id
+  CreatedAt
+  UpdatedAt
+}
+
+# Pagination Type
+type PaginationType {
+  limit: Int!
+  page: Int!
+  total: Int!
+}
+
+# Pagination Input
+input PaginationInput {
+  limit: Int
+  page: Int
+  sortOrder: SortOrderEnum
+  sortBy: SortByEnum
 }
 
 # Users
@@ -759,6 +825,11 @@ input UpdateBookAudioInput {
 type BookPage {
   content: String!
   pageNumber: Int!
+}
+
+type BookPagesWithPagination {
+  pagination: PaginationType!
+  bookPages: [BookPage]
 }
 
 # Books
@@ -1087,10 +1158,10 @@ func (ec *executionContext) field_Query_pages_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["id"] = arg0
-	var arg1 *model.Pagination
+	var arg1 *model.PaginationInput
 	if tmp, ok := rawArgs["pagination"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pagination"))
-		arg1, err = ec.unmarshalOPagination2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPagination(ctx, tmp)
+		arg1, err = ec.unmarshalOPaginationInput2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPaginationInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1672,6 +1743,73 @@ func (ec *executionContext) _BookPage_pageNumber(ctx context.Context, field grap
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookPagesWithPagination_pagination(ctx context.Context, field graphql.CollectedField, obj *model.BookPagesWithPagination) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookPagesWithPagination",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pagination, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PaginationType)
+	fc.Result = res
+	return ec.marshalNPaginationType2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPaginationType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _BookPagesWithPagination_bookPages(ctx context.Context, field graphql.CollectedField, obj *model.BookPagesWithPagination) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "BookPagesWithPagination",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BookPages, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.BookPage)
+	fc.Result = res
+	return ec.marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_register(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2304,6 +2442,111 @@ func (ec *executionContext) _Mutation_deletePublisher(ctx context.Context, field
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PaginationType_limit(ctx context.Context, field graphql.CollectedField, obj *model.PaginationType) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaginationType",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Limit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaginationType_page(ctx context.Context, field graphql.CollectedField, obj *model.PaginationType) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaginationType",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Page, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PaginationType_total(ctx context.Context, field graphql.CollectedField, obj *model.PaginationType) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PaginationType",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Publisher_id(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2572,18 +2815,21 @@ func (ec *executionContext) _Query_pages(ctx context.Context, field graphql.Coll
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Pages(rctx, args["id"].(int64), args["pagination"].(*model.Pagination))
+		return ec.resolvers.Query().Pages(rctx, args["id"].(int64), args["pagination"].(*model.PaginationInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.BookPage)
+	res := resTmp.(*model.BookPagesWithPagination)
 	fc.Result = res
-	return ec.marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx, field.Selections, res)
+	return ec.marshalNBookPagesWithPagination2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPagesWithPagination(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_audios(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4157,25 +4403,41 @@ func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputPagination(ctx context.Context, obj interface{}) (model.Pagination, error) {
-	var it model.Pagination
+func (ec *executionContext) unmarshalInputPaginationInput(ctx context.Context, obj interface{}) (model.PaginationInput, error) {
+	var it model.PaginationInput
 	var asMap = obj.(map[string]interface{})
 
 	for k, v := range asMap {
 		switch k {
-		case "Limit":
+		case "limit":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Limit"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
 			it.Limit, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "Page":
+		case "page":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Page"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("page"))
 			it.Page, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sortOrder":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortOrder"))
+			it.SortOrder, err = ec.unmarshalOSortOrderEnum2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐSortOrderEnum(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sortBy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sortBy"))
+			it.SortBy, err = ec.unmarshalOSortByEnum2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐSortByEnum(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4561,6 +4823,35 @@ func (ec *executionContext) _BookPage(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
+var bookPagesWithPaginationImplementors = []string{"BookPagesWithPagination"}
+
+func (ec *executionContext) _BookPagesWithPagination(ctx context.Context, sel ast.SelectionSet, obj *model.BookPagesWithPagination) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, bookPagesWithPaginationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BookPagesWithPagination")
+		case "pagination":
+			out.Values[i] = ec._BookPagesWithPagination_pagination(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "bookPages":
+			out.Values[i] = ec._BookPagesWithPagination_bookPages(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -4648,6 +4939,43 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deletePublisher":
 			out.Values[i] = ec._Mutation_deletePublisher(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var paginationTypeImplementors = []string{"PaginationType"}
+
+func (ec *executionContext) _PaginationType(ctx context.Context, sel ast.SelectionSet, obj *model.PaginationType) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, paginationTypeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PaginationType")
+		case "limit":
+			out.Values[i] = ec._PaginationType_limit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "page":
+			out.Values[i] = ec._PaginationType_page(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "total":
+			out.Values[i] = ec._PaginationType_total(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4770,6 +5098,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_pages(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "audios":
@@ -5158,6 +5489,20 @@ func (ec *executionContext) marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockb
 	return ec._BookAudio(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNBookPagesWithPagination2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPagesWithPagination(ctx context.Context, sel ast.SelectionSet, v model.BookPagesWithPagination) graphql.Marshaler {
+	return ec._BookPagesWithPagination(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBookPagesWithPagination2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPagesWithPagination(ctx context.Context, sel ast.SelectionSet, v *model.BookPagesWithPagination) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._BookPagesWithPagination(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5226,6 +5571,16 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 func (ec *executionContext) unmarshalNLoginInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
 	res, err := ec.unmarshalInputLoginInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPaginationType2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPaginationType(ctx context.Context, sel ast.SelectionSet, v *model.PaginationType) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PaginationType(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNPublisher2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx context.Context, sel ast.SelectionSet, v model.Publisher) graphql.Marshaler {
@@ -5812,11 +6167,11 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
-func (ec *executionContext) unmarshalOPagination2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPagination(ctx context.Context, v interface{}) (*model.Pagination, error) {
+func (ec *executionContext) unmarshalOPaginationInput2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPaginationInput(ctx context.Context, v interface{}) (*model.PaginationInput, error) {
 	if v == nil {
 		return nil, nil
 	}
-	res, err := ec.unmarshalInputPagination(ctx, v)
+	res, err := ec.unmarshalInputPaginationInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -5865,6 +6220,38 @@ func (ec *executionContext) marshalOPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockb
 		return graphql.Null
 	}
 	return ec._Publisher(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOSortByEnum2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐSortByEnum(ctx context.Context, v interface{}) (*model.SortByEnum, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.SortByEnum)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOSortByEnum2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐSortByEnum(ctx context.Context, sel ast.SelectionSet, v *model.SortByEnum) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOSortOrderEnum2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐSortOrderEnum(ctx context.Context, v interface{}) (*model.SortOrderEnum, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.SortOrderEnum)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOSortOrderEnum2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐSortOrderEnum(ctx context.Context, sel ast.SelectionSet, v *model.SortOrderEnum) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

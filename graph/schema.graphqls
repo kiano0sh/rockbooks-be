@@ -6,7 +6,7 @@ type Query {
   authors: [Author]
   author(id: ID!): Author!
   publishers: [Publisher]
-  pages(id: ID!, pagination: Pagination): [BookPage]
+  pages(id: ID!, pagination: PaginationInput): BookPagesWithPagination!
   audios(id: ID!): [BookAudio]
   publisher(id: ID!): Publisher!
   books: [Book]
@@ -33,9 +33,29 @@ type Mutation {
 }
 
 # Pagination
-input Pagination {
-  Limit: Int
-  Page: Int
+
+enum SortOrderEnum {
+  ASC
+  DESC
+}
+
+enum SortByEnum {
+  Id
+  CreatedAt
+  UpdatedAt
+}
+
+type PaginationType {
+  limit: Int!
+  page: Int!
+  total: Int!
+}
+
+input PaginationInput {
+  limit: Int
+  page: Int
+  sortOrder: SortOrderEnum
+  sortBy: SortByEnum
 }
 
 # Users
@@ -121,6 +141,11 @@ input UpdateBookAudioInput {
 type BookPage {
   content: String!
   pageNumber: Int!
+}
+
+type BookPagesWithPagination {
+  pagination: PaginationType!
+  bookPages: [BookPage]
 }
 
 # Books

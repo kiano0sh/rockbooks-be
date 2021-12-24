@@ -3,6 +3,10 @@
 package model
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/99designs/gqlgen/graphql"
 )
 
@@ -33,6 +37,11 @@ type BookPage struct {
 	PageNumber int    `json:"pageNumber"`
 }
 
+type BookPagesWithPagination struct {
+	Pagination *PaginationType `json:"pagination"`
+	BookPages  []*BookPage     `json:"bookPages"`
+}
+
 type CreateAuthorInput struct {
 	Name string `json:"name"`
 }
@@ -60,9 +69,17 @@ type LoginInput struct {
 	Password string `json:"password"`
 }
 
-type Pagination struct {
-	Limit *int `json:"Limit"`
-	Page  *int `json:"Page"`
+type PaginationInput struct {
+	Limit     *int           `json:"limit"`
+	Page      *int           `json:"page"`
+	SortOrder *SortOrderEnum `json:"sortOrder"`
+	SortBy    *SortByEnum    `json:"sortBy"`
+}
+
+type PaginationType struct {
+	Limit int `json:"limit"`
+	Page  int `json:"page"`
+	Total int `json:"total"`
 }
 
 type Publisher struct {
@@ -110,4 +127,88 @@ type User struct {
 	DisplayName string  `json:"displayName"`
 	Email       string  `json:"email"`
 	Avatar      *string `json:"avatar"`
+}
+
+type SortByEnum string
+
+const (
+	SortByEnumID        SortByEnum = "Id"
+	SortByEnumCreatedAt SortByEnum = "CreatedAt"
+	SortByEnumUpdatedAt SortByEnum = "UpdatedAt"
+)
+
+var AllSortByEnum = []SortByEnum{
+	SortByEnumID,
+	SortByEnumCreatedAt,
+	SortByEnumUpdatedAt,
+}
+
+func (e SortByEnum) IsValid() bool {
+	switch e {
+	case SortByEnumID, SortByEnumCreatedAt, SortByEnumUpdatedAt:
+		return true
+	}
+	return false
+}
+
+func (e SortByEnum) String() string {
+	return string(e)
+}
+
+func (e *SortByEnum) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SortByEnum(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SortByEnum", str)
+	}
+	return nil
+}
+
+func (e SortByEnum) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SortOrderEnum string
+
+const (
+	SortOrderEnumAsc  SortOrderEnum = "ASC"
+	SortOrderEnumDesc SortOrderEnum = "DESC"
+)
+
+var AllSortOrderEnum = []SortOrderEnum{
+	SortOrderEnumAsc,
+	SortOrderEnumDesc,
+}
+
+func (e SortOrderEnum) IsValid() bool {
+	switch e {
+	case SortOrderEnumAsc, SortOrderEnumDesc:
+		return true
+	}
+	return false
+}
+
+func (e SortOrderEnum) String() string {
+	return string(e)
+}
+
+func (e *SortOrderEnum) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SortOrderEnum(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SortOrderEnum", str)
+	}
+	return nil
+}
+
+func (e SortOrderEnum) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

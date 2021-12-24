@@ -9,11 +9,11 @@ import (
 type PaginationInput struct {
 	Limit int
 	Page  int
+	Sort  string
 }
 
 type Pagination struct {
 	PaginationInput
-	Sort       string
 	TotalRows  int64
 	TotalPages int
 	Rows       interface{}
@@ -55,4 +55,8 @@ func Paginate(value interface{}, pagination *Pagination, db *gorm.DB) func(db *g
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Offset(pagination.GetOffset()).Limit(pagination.GetLimit()).Order(pagination.GetSort())
 	}
+}
+
+func GenerateSortByStatement(sortOrder, sortByString string) string {
+	return sortOrder + " " + sortByString
 }
