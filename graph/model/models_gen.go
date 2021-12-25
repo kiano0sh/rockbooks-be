@@ -17,6 +17,7 @@ type Author struct {
 }
 
 type Book struct {
+	ID        int64      `json:"id"`
 	Name      string     `json:"name"`
 	Author    *Author    `json:"author"`
 	Publisher *Publisher `json:"publisher"`
@@ -24,6 +25,7 @@ type Book struct {
 }
 
 type BookAudio struct {
+	ID           int64  `json:"id"`
 	CreatedBy    *User  `json:"createdBy"`
 	Audio        string `json:"audio"`
 	Book         *Book  `json:"book"`
@@ -33,6 +35,7 @@ type BookAudio struct {
 }
 
 type BookPage struct {
+	ID         int64  `json:"id"`
 	Content    string `json:"content"`
 	PageNumber int    `json:"pageNumber"`
 }
@@ -40,6 +43,11 @@ type BookPage struct {
 type BookPagesWithPagination struct {
 	Pagination *PaginationType `json:"pagination"`
 	BookPages  []*BookPage     `json:"bookPages"`
+}
+
+type BooksWithPagination struct {
+	Pagination *PaginationType `json:"pagination"`
+	Books      []*Book         `json:"books"`
 }
 
 type CreateAuthorInput struct {

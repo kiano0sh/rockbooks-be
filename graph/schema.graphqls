@@ -9,7 +9,7 @@ type Query {
   pages(id: ID!, pagination: PaginationInput): BookPagesWithPagination!
   audios(id: ID!): [BookAudio]
   publisher(id: ID!): Publisher!
-  books: [Book]
+  books(pagination: PaginationInput): BooksWithPagination!
   book(id: ID!): Book!
 }
 
@@ -114,6 +114,7 @@ input UpdatePublisherInput {
 
 # BookAudios
 type BookAudio {
+  id: ID!
   createdBy: User!
   audio: String!
   book: Book!
@@ -139,6 +140,7 @@ input UpdateBookAudioInput {
 
 # BookPages
 type BookPage {
+  id: ID!
   content: String!
   pageNumber: Int!
 }
@@ -150,10 +152,16 @@ type BookPagesWithPagination {
 
 # Books
 type Book {
+  id: ID!
   name: String!
   author: Author!
   publisher: Publisher!
   createdAt: String!
+}
+
+type BooksWithPagination {
+  pagination: PaginationType!
+  books: [Book]
 }
 
 input CreateBookInput {

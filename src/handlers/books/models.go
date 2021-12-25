@@ -41,11 +41,12 @@ type BookPage struct {
 
 type Book struct {
 	gorm.Model
-	ID          int64
-	Name        string `gorm:"size:128"`
-	Pages       []BookPage
-	AudioBooks  []BookAudio
-	AuthorID    int64
-	PublisherID int64
-	BookFile    graphql.Upload `gorm:"-"`
+	pagination.PaginationInput `gorm:"-"`
+	ID                         int64
+	Name                       string `gorm:"size:128"`
+	Pages                      []BookPage
+	AudioBooks                 []BookAudio
+	AuthorID                   int64
+	PublisherID                int64
+	BookFile                   graphql.Upload `gorm:"-"`
 }

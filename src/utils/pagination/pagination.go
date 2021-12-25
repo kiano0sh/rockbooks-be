@@ -3,6 +3,7 @@ package pagination
 import (
 	"math"
 
+	"gitlab.com/kian00sh/rockbooks-be/graph/model"
 	"gorm.io/gorm"
 )
 
@@ -57,6 +58,23 @@ func Paginate(value interface{}, pagination *Pagination, db *gorm.DB) func(db *g
 	}
 }
 
-func GenerateSortByStatement(sortOrder, sortByString string) string {
-	return sortOrder + " " + sortByString
+func GenerateSortByStatement(pagination *model.PaginationInput) string {
+	sortBy := model.SortByEnumID.String()
+	if pagination.SortBy != nil {
+		sortBy = pagination.SortBy.String()
+	}
+	sortOrder := model.SortOrderEnumAsc.String()
+	if pagination.SortOrder != nil {
+		sortOrder = pagination.SortOrder.String()
+	}
+	return sortBy + " " + sortOrder
+}
+
+func CreatePaginationInput(pagination *model.PaginationInput) PaginationInput {
+	sortStatement := GenerateSortByStatement(pagination)
+	return PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit, Sort: sortStatement}
+}
+
+func CreatePaginationResult(paginationValues *Pagination) *model.PaginationType {
+	return &model.PaginationType{Limit: paginationValues.Limit, Page: paginationValues.Page, Total: paginationValues.TotalPages}
 }

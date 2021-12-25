@@ -10,6 +10,31 @@ import (
 
 // Books
 
+func (book *Book) GetBook() (*model.Book, error) {
+	var bookResult *Book
+	result := database.DB.Where("id = ?", book.ID).First(&bookResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت کتاب پیش آمده است!", result.Error)
+	}
+	// bookResult.auth
+	return &model.Book{ID: bookResult.ID, Name: bookResult.Name, CreatedAt: bookResult.CreatedAt.String()}, nil
+}
+
+func (books *Book) GetBooks() ([]*model.Book, *pagination.Pagination, error) {
+	var booksResult []*Book
+	var paginationResult pagination.Pagination
+	paginationResult.PaginationInput = books.PaginationInput
+	result := database.DB.Scopes(pagination.Paginate(booksResult, &paginationResult, database.DB)).Find(&booksResult)
+	if result.Error != nil {
+		return nil, nil, grapherrors.ReturnGQLError("در دریافت کتاب ها مشکلی پیش آمده است", result.Error)
+	}
+	var typedBooksResult []*model.Book
+	for _, book := range booksResult {
+		typedBooksResult = append(typedBooksResult, &model.Book{ID: book.ID, Name: book.Name, CreatedAt: book.CreatedAt.String()})
+	}
+	return typedBooksResult, &paginationResult, nil
+}
+
 func (book *Book) CreateBook() (*model.Book, error) {
 	theBook, err := fitz.NewFromReader(book.BookFile.File)
 	if err != nil {
@@ -32,21 +57,19 @@ func (book *Book) CreateBook() (*model.Book, error) {
 	if result.Error != nil {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت کتاب پیش آمده است، لطفا مجددا تلاش کنید", result.Error)
 	}
-	// TODO Fetch the Author from its method and place it in the output
-	// TODO Fetch the Publisher from its method and place it in the output
-	return &model.Book{Name: book.Name}, nil
+	return &model.Book{ID: book.ID, Name: book.Name, CreatedAt: book.CreatedAt.String()}, nil
 }
 
 // Pages
 func (bookPage *BookPage) GetBookPages() ([]*model.BookPage, *pagination.Pagination, error) {
-	var pages []*model.BookPage
+	var bookPagesResult []*model.BookPage
 	var paginationResult pagination.Pagination
 	paginationResult.PaginationInput = bookPage.PaginationInput
-	result := database.DB.Scopes(pagination.Paginate(pages, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&pages)
+	result := database.DB.Scopes(pagination.Paginate(bookPagesResult, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&bookPagesResult)
 	if result.Error != nil {
 		return nil, nil, grapherrors.ReturnGQLError("در دریافت صفحات کتاب مشکلی پیش آمده!", result.Error)
 	}
-	return pages, &paginationResult, nil
+	return bookPagesResult, &paginationResult, nil
 }
 
 // author

@@ -146,14 +146,13 @@ func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, err
 
 func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.PaginationInput) (*model.BookPagesWithPagination, error) {
 	var bookPage books.BookPage
-	sortStatement := mainPagination.GenerateSortByStatement(pagination.SortBy.String(), pagination.SortOrder.String())
-	bookPage.PaginationInput = mainPagination.PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit, Sort: sortStatement}
+	bookPage.PaginationInput = mainPagination.CreatePaginationInput(pagination)
 	bookPage.BookID = id
-	pages, paginationResult, err := bookPage.GetBookPages()
+	pages, paginationValues, err := bookPage.GetBookPages()
 	if err != nil {
 		return nil, err
 	}
-	return &model.BookPagesWithPagination{Pagination: &model.PaginationType{Limit: paginationResult.Limit, Page: paginationResult.Page, Total: paginationResult.TotalPages}, BookPages: pages}, nil
+	return &model.BookPagesWithPagination{Pagination: mainPagination.CreatePaginationResult(paginationValues), BookPages: pages}, nil
 }
 
 func (r *queryResolver) Audios(ctx context.Context, id int64) ([]*model.BookAudio, error) {
@@ -164,12 +163,24 @@ func (r *queryResolver) Publisher(ctx context.Context, id int64) (*model.Publish
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Books(ctx context.Context) ([]*model.Book, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Books(ctx context.Context, pagination *model.PaginationInput) (*model.BooksWithPagination, error) {
+	var booksInstance books.Book
+	booksInstance.PaginationInput = mainPagination.CreatePaginationInput(pagination)
+	booksResult, paginationValues, err := booksInstance.GetBooks()
+	if err != nil {
+		return nil, err
+	}
+	return &model.BooksWithPagination{Pagination: mainPagination.CreatePaginationResult(paginationValues), Books: booksResult}, nil
 }
 
 func (r *queryResolver) Book(ctx context.Context, id int64) (*model.Book, error) {
-	panic(fmt.Errorf("not implemented"))
+	var bookInstance books.Book
+	bookInstance.ID = id
+	bookResult, err := bookInstance.GetBook()
+	if err != nil {
+		return nil, err
+	}
+	return bookResult, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
