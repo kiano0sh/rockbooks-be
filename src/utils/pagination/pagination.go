@@ -3,7 +3,6 @@ package pagination
 import (
 	"math"
 
-	"gitlab.com/kian00sh/rockbooks-be/graph/model"
 	"gorm.io/gorm"
 )
 
@@ -11,6 +10,14 @@ type PaginationInput struct {
 	Limit int
 	Page  int
 	Sort  string
+}
+
+type PaginationOutput struct {
+	Limit     int
+	Page      int
+	Total     int
+	SortBy    string
+	SortOrder string
 }
 
 type Pagination struct {
@@ -58,23 +65,23 @@ func Paginate(value interface{}, pagination *Pagination, db *gorm.DB) func(db *g
 	}
 }
 
-func GenerateSortByStatement(pagination *model.PaginationInput) string {
-	sortBy := model.SortByEnumID.String()
-	if pagination.SortBy != nil {
-		sortBy = pagination.SortBy.String()
+func GenerateSortStatement(pagination *PaginationOutput) string {
+	sortBy := "Id"
+	if pagination.SortBy != "" {
+		sortBy = pagination.SortBy
 	}
-	sortOrder := model.SortOrderEnumAsc.String()
-	if pagination.SortOrder != nil {
-		sortOrder = pagination.SortOrder.String()
+	sortOrder := "ASC"
+	if pagination.SortOrder != "" {
+		sortOrder = pagination.SortOrder
 	}
 	return sortBy + " " + sortOrder
 }
 
-func CreatePaginationInput(pagination *model.PaginationInput) PaginationInput {
-	sortStatement := GenerateSortByStatement(pagination)
-	return PaginationInput{Page: *pagination.Page, Limit: *pagination.Limit, Sort: sortStatement}
+func CreatePaginationInput(pagination *PaginationOutput) PaginationInput {
+	sortStatement := GenerateSortStatement(pagination)
+	return PaginationInput{Page: pagination.Page, Limit: pagination.Limit, Sort: sortStatement}
 }
 
-func CreatePaginationResult(paginationValues *Pagination) *model.PaginationType {
-	return &model.PaginationType{Limit: paginationValues.Limit, Page: paginationValues.Page, Total: paginationValues.TotalPages}
+func CreatePaginationResult(paginationValues *Pagination) *PaginationOutput {
+	return &PaginationOutput{Limit: paginationValues.Limit, Page: paginationValues.Page, Total: paginationValues.TotalPages}
 }

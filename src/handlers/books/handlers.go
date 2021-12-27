@@ -2,7 +2,6 @@ package books
 
 import (
 	"github.com/gen2brain/go-fitz"
-	"gitlab.com/kian00sh/rockbooks-be/graph/model"
 	database "gitlab.com/kian00sh/rockbooks-be/src/database/postgresql"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
@@ -10,32 +9,7 @@ import (
 
 // Books
 
-func (book *Book) GetBook() (*model.Book, error) {
-	var bookResult *Book
-	result := database.DB.Where("id = ?", book.ID).First(&bookResult)
-	if result.Error != nil {
-		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت کتاب پیش آمده است!", result.Error)
-	}
-	// bookResult.auth
-	return &model.Book{ID: bookResult.ID, Name: bookResult.Name, CreatedAt: bookResult.CreatedAt.String()}, nil
-}
-
-func (books *Book) GetBooks() ([]*model.Book, *pagination.Pagination, error) {
-	var booksResult []*Book
-	var paginationResult pagination.Pagination
-	paginationResult.PaginationInput = books.PaginationInput
-	result := database.DB.Scopes(pagination.Paginate(booksResult, &paginationResult, database.DB)).Find(&booksResult)
-	if result.Error != nil {
-		return nil, nil, grapherrors.ReturnGQLError("در دریافت کتاب ها مشکلی پیش آمده است", result.Error)
-	}
-	var typedBooksResult []*model.Book
-	for _, book := range booksResult {
-		typedBooksResult = append(typedBooksResult, &model.Book{ID: book.ID, Name: book.Name, CreatedAt: book.CreatedAt.String()})
-	}
-	return typedBooksResult, &paginationResult, nil
-}
-
-func (book *Book) CreateBook() (*model.Book, error) {
+func (book *Book) CreateBook() (*Book, error) {
 	theBook, err := fitz.NewFromReader(book.BookFile.File)
 	if err != nil {
 		grapherrors.ReturnGQLError("مشکلی در آغاز فرایند ثبت کتاب پیش آمده است، لطفا مجددا تلاش کنید", err)
@@ -57,12 +31,41 @@ func (book *Book) CreateBook() (*model.Book, error) {
 	if result.Error != nil {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت کتاب پیش آمده است، لطفا مجددا تلاش کنید", result.Error)
 	}
-	return &model.Book{ID: book.ID, Name: book.Name, CreatedAt: book.CreatedAt.String()}, nil
+	return book, nil
 }
 
-// Pages
-func (bookPage *BookPage) GetBookPages() ([]*model.BookPage, *pagination.Pagination, error) {
-	var bookPagesResult []*model.BookPage
+func (book *Book) GetBook() (*Book, error) {
+	var bookResult *Book
+	result := database.DB.Where("id = ?", book.ID).First(&bookResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت کتاب پیش آمده است!", result.Error)
+	}
+	return bookResult, nil
+}
+
+func (books *Book) GetBooks() ([]*Book, *pagination.Pagination, error) {
+	var booksResult []*Book
+	var paginationResult pagination.Pagination
+	paginationResult.PaginationInput = books.PaginationInput
+	result := database.DB.Scopes(pagination.Paginate(booksResult, &paginationResult, database.DB)).Find(&booksResult)
+	if result.Error != nil {
+		return nil, nil, grapherrors.ReturnGQLError("در دریافت کتاب ها مشکلی پیش آمده است", result.Error)
+	}
+	return booksResult, &paginationResult, nil
+}
+
+func (book *Book) Author() (*Author, error) {
+	var authorResult *Author
+	result := database.DB.Where("book_id = ?", book.ID).First(&authorResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت نویسنده پیش آمده است!", result.Error)
+	}
+	return &Author{ID: authorResult.ID, Name: authorResult.Name}, nil
+}
+
+// BookPage
+func (bookPage *BookPage) GetBookPages() ([]*BookPage, *pagination.Pagination, error) {
+	var bookPagesResult []*BookPage
 	var paginationResult pagination.Pagination
 	paginationResult.PaginationInput = bookPage.PaginationInput
 	result := database.DB.Scopes(pagination.Paginate(bookPagesResult, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&bookPagesResult)
@@ -72,25 +75,45 @@ func (bookPage *BookPage) GetBookPages() ([]*model.BookPage, *pagination.Paginat
 	return bookPagesResult, &paginationResult, nil
 }
 
-// author
-// publisher
-// audios
-// pages
+// Author
 
-func (author *Author) CreateAuthor() (*model.Author, error) {
+func (author *Author) CreateAuthor() (*Author, error) {
 	result := database.DB.Create(&author)
 	if result.Error != nil {
 		return nil, grapherrors.ReturnGQLError("این نویسنده قبلا ثبت شده است", result.Error)
 	}
-	var authorBooks []*model.Book
-	return &model.Author{ID: author.ID, Name: author.Name, Books: authorBooks}, nil
+	return author, nil
 }
 
-func (publisher *Publisher) CreatePublisher() (*model.Publisher, error) {
+func (author *Author) GetAuthor() (*Author, error) {
+	var authorResult *Author
+	result := database.DB.Where("id = ?", author.ID).First(&authorResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت نویسنده پیش آمده است!", result.Error)
+	}
+	// bookResult.auth
+	return authorResult, nil
+}
+
+// Publisher
+
+func (publisher *Publisher) CreatePublisher() (*Publisher, error) {
 	result := database.DB.Create(&publisher)
 	if result.Error != nil {
 		return nil, grapherrors.ReturnGQLError("این ناشر قبلا ثبت شده است", result.Error)
 	}
-	var publisherBooks []*model.Book
-	return &model.Publisher{ID: publisher.ID, Name: publisher.Name, Books: publisherBooks}, nil
+	return publisher, nil
 }
+
+func (book *Publisher) GetPublisher() (*Publisher, error) {
+	var publisherResult *Publisher
+	result := database.DB.Where("id = ?", book.ID).First(&publisherResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت ناشر پیش آمده است!", result.Error)
+	}
+	// publisherResult.auth
+	return publisherResult, nil
+}
+
+// audios
+// pages

@@ -69,7 +69,7 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBoo
 	if err != nil {
 		return nil, err
 	}
-	return createdBook, nil
+	return &model.Book{ID: createdBook.ID, Name: createdBook.Name, CreatedAt: createdBook.CreatedAt.String()}, nil
 }
 
 func (r *mutationResolver) UpdateBook(ctx context.Context, input model.UpdateBookInput) (*model.Book, error) {
@@ -99,7 +99,7 @@ func (r *mutationResolver) CreateAuthor(ctx context.Context, input model.CreateA
 	if err != nil {
 		return nil, err
 	}
-	return createdAuthor, nil
+	return &model.Author{ID: createdAuthor.ID, Name: createdAuthor.Name}, nil
 }
 
 func (r *mutationResolver) UpdateAuthor(ctx context.Context, input model.UpdateAuthorInput) (*model.Author, error) {
@@ -117,7 +117,7 @@ func (r *mutationResolver) CreatePublisher(ctx context.Context, input model.Crea
 	if err != nil {
 		return nil, err
 	}
-	return createdPublisher, nil
+	return &model.Publisher{ID: createdPublisher.ID, Name: createdPublisher.Name}, nil
 }
 
 func (r *mutationResolver) UpdatePublisher(ctx context.Context, input model.UpdatePublisherInput) (*model.Publisher, error) {
@@ -146,13 +146,21 @@ func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, err
 
 func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.PaginationInput) (*model.BookPagesWithPagination, error) {
 	var bookPage books.BookPage
-	bookPage.PaginationInput = mainPagination.CreatePaginationInput(pagination)
+	bookPage.PaginationInput = mainPagination.CreatePaginationInput(&mainPagination.PaginationOutput{Limit: *pagination.Limit, Page: *pagination.Page, SortBy: pagination.SortBy.String(), SortOrder: pagination.SortOrder.String()})
 	bookPage.BookID = id
 	pages, paginationValues, err := bookPage.GetBookPages()
 	if err != nil {
 		return nil, err
 	}
-	return &model.BookPagesWithPagination{Pagination: mainPagination.CreatePaginationResult(paginationValues), BookPages: pages}, nil
+	createdPaginationOutput := mainPagination.CreatePaginationResult(paginationValues)
+	graphPaginationOutput := &model.PaginationType{Limit: createdPaginationOutput.Limit, Page: createdPaginationOutput.Page, Total: createdPaginationOutput.Total}
+
+	var typedPagesResult []*model.BookPage
+	for _, page := range pages {
+		typedPagesResult = append(typedPagesResult, &model.BookPage{ID: page.ID, Content: page.Content, PageNumber: page.PageNumber})
+	}
+
+	return &model.BookPagesWithPagination{Pagination: graphPaginationOutput, BookPages: typedPagesResult}, nil
 }
 
 func (r *queryResolver) Audios(ctx context.Context, id int64) ([]*model.BookAudio, error) {
@@ -165,12 +173,20 @@ func (r *queryResolver) Publisher(ctx context.Context, id int64) (*model.Publish
 
 func (r *queryResolver) Books(ctx context.Context, pagination *model.PaginationInput) (*model.BooksWithPagination, error) {
 	var booksInstance books.Book
-	booksInstance.PaginationInput = mainPagination.CreatePaginationInput(pagination)
+	booksInstance.PaginationInput = mainPagination.CreatePaginationInput(&mainPagination.PaginationOutput{Limit: *pagination.Limit, Page: *pagination.Page, SortBy: pagination.SortBy.String(), SortOrder: pagination.SortOrder.String()})
 	booksResult, paginationValues, err := booksInstance.GetBooks()
 	if err != nil {
 		return nil, err
 	}
-	return &model.BooksWithPagination{Pagination: mainPagination.CreatePaginationResult(paginationValues), Books: booksResult}, nil
+	createdPaginationOutput := mainPagination.CreatePaginationResult(paginationValues)
+	graphPaginationOutput := &model.PaginationType{Limit: createdPaginationOutput.Limit, Page: createdPaginationOutput.Page, Total: createdPaginationOutput.Total}
+
+	var typedBooksResult []*model.Book
+	for _, book := range booksResult {
+		typedBooksResult = append(typedBooksResult, &model.Book{ID: book.ID, Name: book.Name, CreatedAt: book.CreatedAt.String()})
+	}
+
+	return &model.BooksWithPagination{Pagination: graphPaginationOutput, Books: typedBooksResult}, nil
 }
 
 func (r *queryResolver) Book(ctx context.Context, id int64) (*model.Book, error) {
@@ -180,7 +196,7 @@ func (r *queryResolver) Book(ctx context.Context, id int64) (*model.Book, error)
 	if err != nil {
 		return nil, err
 	}
-	return bookResult, nil
+	return &model.Book{ID: bookResult.ID, Name: bookResult.Name, CreatedAt: bookResult.CreatedAt.String()}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
