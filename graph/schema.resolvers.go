@@ -16,6 +16,38 @@ import (
 	mainPagination "gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
 )
 
+func (r *bookResolver) Author(ctx context.Context, obj *books.Book) (*books.Author, error) {
+	authorResult, err := obj.GetBookAuthor()
+	if err != nil {
+		return nil, err
+	}
+	return authorResult, nil
+}
+
+func (r *bookResolver) Publisher(ctx context.Context, obj *books.Book) (*books.Publisher, error) {
+	publisherResult, err := obj.GetBookPublisher()
+	if err != nil {
+		return nil, err
+	}
+	return publisherResult, nil
+}
+
+func (r *bookResolver) CreatedAt(ctx context.Context, obj *books.Book) (string, error) {
+	return obj.CreatedAt.String(), nil
+}
+
+func (r *bookAudioResolver) CreatedBy(ctx context.Context, obj *books.BookAudio) (*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *bookAudioResolver) Book(ctx context.Context, obj *books.BookAudio) (*books.Book, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *bookAudioResolver) CreatedAt(ctx context.Context, obj *books.BookAudio) (string, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (string, error) {
 	var user users.User
 	user.DisplayName = input.DisplayName
@@ -59,7 +91,7 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model.Refresh
 	return token, nil
 }
 
-func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBookInput) (*model.Book, error) {
+func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBookInput) (*books.Book, error) {
 	var book books.Book
 	book.Name = input.Name
 	book.BookFile = input.BookFile
@@ -69,10 +101,10 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBoo
 	if err != nil {
 		return nil, err
 	}
-	return &model.Book{ID: createdBook.ID, Name: createdBook.Name, CreatedAt: createdBook.CreatedAt.String()}, nil
+	return createdBook, nil
 }
 
-func (r *mutationResolver) UpdateBook(ctx context.Context, input model.UpdateBookInput) (*model.Book, error) {
+func (r *mutationResolver) UpdateBook(ctx context.Context, input model.UpdateBookInput) (*books.Book, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -80,11 +112,11 @@ func (r *mutationResolver) DeleteBook(ctx context.Context, id int64) (bool, erro
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*model.BookAudio, error) {
+func (r *mutationResolver) CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*books.BookAudio, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateBookAudio(ctx context.Context, input model.UpdateBookAudioInput) (*model.BookAudio, error) {
+func (r *mutationResolver) UpdateBookAudio(ctx context.Context, input model.UpdateBookAudioInput) (*books.BookAudio, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -92,17 +124,17 @@ func (r *mutationResolver) DeleteBookAudio(ctx context.Context, id int64) (bool,
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateAuthor(ctx context.Context, input model.CreateAuthorInput) (*model.Author, error) {
+func (r *mutationResolver) CreateAuthor(ctx context.Context, input model.CreateAuthorInput) (*books.Author, error) {
 	var author books.Author
 	author.Name = input.Name
 	createdAuthor, err := author.CreateAuthor()
 	if err != nil {
 		return nil, err
 	}
-	return &model.Author{ID: createdAuthor.ID, Name: createdAuthor.Name}, nil
+	return createdAuthor, nil
 }
 
-func (r *mutationResolver) UpdateAuthor(ctx context.Context, input model.UpdateAuthorInput) (*model.Author, error) {
+func (r *mutationResolver) UpdateAuthor(ctx context.Context, input model.UpdateAuthorInput) (*books.Author, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -110,17 +142,17 @@ func (r *mutationResolver) DeleteAuthor(ctx context.Context, id int64) (bool, er
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreatePublisher(ctx context.Context, input model.CreatePublisherInput) (*model.Publisher, error) {
+func (r *mutationResolver) CreatePublisher(ctx context.Context, input model.CreatePublisherInput) (*books.Publisher, error) {
 	var publisher books.Publisher
 	publisher.Name = input.Name
 	createdPublisher, err := publisher.CreatePublisher()
 	if err != nil {
 		return nil, err
 	}
-	return &model.Publisher{ID: createdPublisher.ID, Name: createdPublisher.Name}, nil
+	return createdPublisher, nil
 }
 
-func (r *mutationResolver) UpdatePublisher(ctx context.Context, input model.UpdatePublisherInput) (*model.Publisher, error) {
+func (r *mutationResolver) UpdatePublisher(ctx context.Context, input model.UpdatePublisherInput) (*books.Publisher, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -132,15 +164,15 @@ func (r *queryResolver) Self(ctx context.Context) (*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Authors(ctx context.Context) ([]*model.Author, error) {
+func (r *queryResolver) Authors(ctx context.Context) ([]*books.Author, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Author(ctx context.Context, id int64) (*model.Author, error) {
+func (r *queryResolver) Author(ctx context.Context, id int64) (*books.Author, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Publishers(ctx context.Context) ([]*model.Publisher, error) {
+func (r *queryResolver) Publishers(ctx context.Context) ([]*books.Publisher, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -148,26 +180,21 @@ func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.P
 	var bookPage books.BookPage
 	bookPage.PaginationInput = mainPagination.CreatePaginationInput(&mainPagination.PaginationOutput{Limit: *pagination.Limit, Page: *pagination.Page, SortBy: pagination.SortBy.String(), SortOrder: pagination.SortOrder.String()})
 	bookPage.BookID = id
-	pages, paginationValues, err := bookPage.GetBookPages()
+	pagesResult, paginationValues, err := bookPage.GetBookPages()
 	if err != nil {
 		return nil, err
 	}
 	createdPaginationOutput := mainPagination.CreatePaginationResult(paginationValues)
 	graphPaginationOutput := &model.PaginationType{Limit: createdPaginationOutput.Limit, Page: createdPaginationOutput.Page, Total: createdPaginationOutput.Total}
 
-	var typedPagesResult []*model.BookPage
-	for _, page := range pages {
-		typedPagesResult = append(typedPagesResult, &model.BookPage{ID: page.ID, Content: page.Content, PageNumber: page.PageNumber})
-	}
-
-	return &model.BookPagesWithPagination{Pagination: graphPaginationOutput, BookPages: typedPagesResult}, nil
+	return &model.BookPagesWithPagination{Pagination: graphPaginationOutput, BookPages: pagesResult}, nil
 }
 
-func (r *queryResolver) Audios(ctx context.Context, id int64) ([]*model.BookAudio, error) {
+func (r *queryResolver) Audios(ctx context.Context, id int64) ([]*books.BookAudio, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Publisher(ctx context.Context, id int64) (*model.Publisher, error) {
+func (r *queryResolver) Publisher(ctx context.Context, id int64) (*books.Publisher, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -181,23 +208,24 @@ func (r *queryResolver) Books(ctx context.Context, pagination *model.PaginationI
 	createdPaginationOutput := mainPagination.CreatePaginationResult(paginationValues)
 	graphPaginationOutput := &model.PaginationType{Limit: createdPaginationOutput.Limit, Page: createdPaginationOutput.Page, Total: createdPaginationOutput.Total}
 
-	var typedBooksResult []*model.Book
-	for _, book := range booksResult {
-		typedBooksResult = append(typedBooksResult, &model.Book{ID: book.ID, Name: book.Name, CreatedAt: book.CreatedAt.String()})
-	}
-
-	return &model.BooksWithPagination{Pagination: graphPaginationOutput, Books: typedBooksResult}, nil
+	return &model.BooksWithPagination{Pagination: graphPaginationOutput, Books: booksResult}, nil
 }
 
-func (r *queryResolver) Book(ctx context.Context, id int64) (*model.Book, error) {
+func (r *queryResolver) Book(ctx context.Context, id int64) (*books.Book, error) {
 	var bookInstance books.Book
 	bookInstance.ID = id
 	bookResult, err := bookInstance.GetBook()
 	if err != nil {
 		return nil, err
 	}
-	return &model.Book{ID: bookResult.ID, Name: bookResult.Name, CreatedAt: bookResult.CreatedAt.String()}, nil
+	return bookResult, nil
 }
+
+// Book returns generated.BookResolver implementation.
+func (r *Resolver) Book() generated.BookResolver { return &bookResolver{r} }
+
+// BookAudio returns generated.BookAudioResolver implementation.
+func (r *Resolver) BookAudio() generated.BookAudioResolver { return &bookAudioResolver{r} }
 
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
@@ -205,5 +233,7 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type bookResolver struct{ *Resolver }
+type bookAudioResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

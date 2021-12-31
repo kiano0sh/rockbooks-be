@@ -54,13 +54,22 @@ func (books *Book) GetBooks() ([]*Book, *pagination.Pagination, error) {
 	return booksResult, &paginationResult, nil
 }
 
-func (book *Book) Author() (*Author, error) {
+func (book *Book) GetBookAuthor() (*Author, error) {
 	var authorResult *Author
-	result := database.DB.Where("book_id = ?", book.ID).First(&authorResult)
+	result := database.DB.Where("id = ?", book.AuthorID).First(&authorResult)
 	if result.Error != nil {
 		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت نویسنده پیش آمده است!", result.Error)
 	}
-	return &Author{ID: authorResult.ID, Name: authorResult.Name}, nil
+	return authorResult, nil
+}
+
+func (book *Book) GetBookPublisher() (*Publisher, error) {
+	var publisherResult *Publisher
+	result := database.DB.Where("id = ?", book.PublisherID).First(&publisherResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت ناشر پیش آمده است!", result.Error)
+	}
+	return publisherResult, nil
 }
 
 // BookPage

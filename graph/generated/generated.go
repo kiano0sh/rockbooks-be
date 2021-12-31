@@ -15,6 +15,7 @@ import (
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 	"gitlab.com/kian00sh/rockbooks-be/graph/model"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/books"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -35,6 +36,8 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Book() BookResolver
+	BookAudio() BookAudioResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -132,33 +135,45 @@ type ComplexityRoot struct {
 	}
 }
 
+type BookResolver interface {
+	Author(ctx context.Context, obj *books.Book) (*books.Author, error)
+	Publisher(ctx context.Context, obj *books.Book) (*books.Publisher, error)
+	CreatedAt(ctx context.Context, obj *books.Book) (string, error)
+}
+type BookAudioResolver interface {
+	CreatedBy(ctx context.Context, obj *books.BookAudio) (*model.User, error)
+
+	Book(ctx context.Context, obj *books.BookAudio) (*books.Book, error)
+
+	CreatedAt(ctx context.Context, obj *books.BookAudio) (string, error)
+}
 type MutationResolver interface {
 	Register(ctx context.Context, input model.RegisterInput) (string, error)
 	Login(ctx context.Context, input model.LoginInput) (string, error)
 	RefreshToken(ctx context.Context, input model.RefreshTokenInput) (string, error)
-	CreateBook(ctx context.Context, input model.CreateBookInput) (*model.Book, error)
-	UpdateBook(ctx context.Context, input model.UpdateBookInput) (*model.Book, error)
+	CreateBook(ctx context.Context, input model.CreateBookInput) (*books.Book, error)
+	UpdateBook(ctx context.Context, input model.UpdateBookInput) (*books.Book, error)
 	DeleteBook(ctx context.Context, id int64) (bool, error)
-	CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*model.BookAudio, error)
-	UpdateBookAudio(ctx context.Context, input model.UpdateBookAudioInput) (*model.BookAudio, error)
+	CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*books.BookAudio, error)
+	UpdateBookAudio(ctx context.Context, input model.UpdateBookAudioInput) (*books.BookAudio, error)
 	DeleteBookAudio(ctx context.Context, id int64) (bool, error)
-	CreateAuthor(ctx context.Context, input model.CreateAuthorInput) (*model.Author, error)
-	UpdateAuthor(ctx context.Context, input model.UpdateAuthorInput) (*model.Author, error)
+	CreateAuthor(ctx context.Context, input model.CreateAuthorInput) (*books.Author, error)
+	UpdateAuthor(ctx context.Context, input model.UpdateAuthorInput) (*books.Author, error)
 	DeleteAuthor(ctx context.Context, id int64) (bool, error)
-	CreatePublisher(ctx context.Context, input model.CreatePublisherInput) (*model.Publisher, error)
-	UpdatePublisher(ctx context.Context, input model.UpdatePublisherInput) (*model.Publisher, error)
+	CreatePublisher(ctx context.Context, input model.CreatePublisherInput) (*books.Publisher, error)
+	UpdatePublisher(ctx context.Context, input model.UpdatePublisherInput) (*books.Publisher, error)
 	DeletePublisher(ctx context.Context, id int64) (bool, error)
 }
 type QueryResolver interface {
 	Self(ctx context.Context) (*model.User, error)
-	Authors(ctx context.Context) ([]*model.Author, error)
-	Author(ctx context.Context, id int64) (*model.Author, error)
-	Publishers(ctx context.Context) ([]*model.Publisher, error)
+	Authors(ctx context.Context) ([]*books.Author, error)
+	Author(ctx context.Context, id int64) (*books.Author, error)
+	Publishers(ctx context.Context) ([]*books.Publisher, error)
 	Pages(ctx context.Context, id int64, pagination *model.PaginationInput) (*model.BookPagesWithPagination, error)
-	Audios(ctx context.Context, id int64) ([]*model.BookAudio, error)
-	Publisher(ctx context.Context, id int64) (*model.Publisher, error)
+	Audios(ctx context.Context, id int64) ([]*books.BookAudio, error)
+	Publisher(ctx context.Context, id int64) (*books.Publisher, error)
 	Books(ctx context.Context, pagination *model.PaginationInput) (*model.BooksWithPagination, error)
-	Book(ctx context.Context, id int64) (*model.Book, error)
+	Book(ctx context.Context, id int64) (*books.Book, error)
 }
 
 type executableSchema struct {
@@ -1294,7 +1309,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Author_id(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_id(ctx context.Context, field graphql.CollectedField, obj *books.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1329,7 +1344,7 @@ func (ec *executionContext) _Author_id(ctx context.Context, field graphql.Collec
 	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Author_name(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_name(ctx context.Context, field graphql.CollectedField, obj *books.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1364,7 +1379,7 @@ func (ec *executionContext) _Author_name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Author_books(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_books(ctx context.Context, field graphql.CollectedField, obj *books.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1391,12 +1406,12 @@ func (ec *executionContext) _Author_books(ctx context.Context, field graphql.Col
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Book)
+	res := resTmp.([]books.Book)
 	fc.Result = res
-	return ec.marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookᚄ(ctx, field.Selections, res)
+	return ec.marshalOBook2ᚕgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_id(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_id(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1431,7 +1446,7 @@ func (ec *executionContext) _Book_id(ctx context.Context, field graphql.Collecte
 	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_name(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_name(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1466,7 +1481,7 @@ func (ec *executionContext) _Book_name(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_author(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_author(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1477,14 +1492,14 @@ func (ec *executionContext) _Book_author(ctx context.Context, field graphql.Coll
 		Object:     "Book",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Author, nil
+		return ec.resolvers.Book().Author(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1496,12 +1511,12 @@ func (ec *executionContext) _Book_author(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Author)
+	res := resTmp.(*books.Author)
 	fc.Result = res
-	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_publisher(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_publisher(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1512,14 +1527,14 @@ func (ec *executionContext) _Book_publisher(ctx context.Context, field graphql.C
 		Object:     "Book",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Publisher, nil
+		return ec.resolvers.Book().Publisher(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1531,12 +1546,12 @@ func (ec *executionContext) _Book_publisher(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Publisher)
+	res := resTmp.(*books.Publisher)
 	fc.Result = res
-	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, field.Selections, res)
+	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Book_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Book) (ret graphql.Marshaler) {
+func (ec *executionContext) _Book_createdAt(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1547,14 +1562,14 @@ func (ec *executionContext) _Book_createdAt(ctx context.Context, field graphql.C
 		Object:     "Book",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
+		return ec.resolvers.Book().CreatedAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1571,7 +1586,7 @@ func (ec *executionContext) _Book_createdAt(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_id(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_id(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1606,7 +1621,7 @@ func (ec *executionContext) _BookAudio_id(ctx context.Context, field graphql.Col
 	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_createdBy(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_createdBy(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1617,14 +1632,14 @@ func (ec *executionContext) _BookAudio_createdBy(ctx context.Context, field grap
 		Object:     "BookAudio",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedBy, nil
+		return ec.resolvers.BookAudio().CreatedBy(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1641,7 +1656,7 @@ func (ec *executionContext) _BookAudio_createdBy(ctx context.Context, field grap
 	return ec.marshalNUser2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_audio(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_audio(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1676,7 +1691,7 @@ func (ec *executionContext) _BookAudio_audio(ctx context.Context, field graphql.
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_book(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_book(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1687,14 +1702,14 @@ func (ec *executionContext) _BookAudio_book(ctx context.Context, field graphql.C
 		Object:     "BookAudio",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Book, nil
+		return ec.resolvers.BookAudio().Book(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1706,12 +1721,12 @@ func (ec *executionContext) _BookAudio_book(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Book)
+	res := resTmp.(*books.Book)
 	fc.Result = res
-	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
+	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_cursorStarts(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_cursorStarts(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1741,12 +1756,12 @@ func (ec *executionContext) _BookAudio_cursorStarts(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(int64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_cursorEnds(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_cursorEnds(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1776,12 +1791,12 @@ func (ec *executionContext) _BookAudio_cursorEnds(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(int64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookAudio_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.BookAudio) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookAudio_createdAt(ctx context.Context, field graphql.CollectedField, obj *books.BookAudio) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1792,14 +1807,14 @@ func (ec *executionContext) _BookAudio_createdAt(ctx context.Context, field grap
 		Object:     "BookAudio",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.CreatedAt, nil
+		return ec.resolvers.BookAudio().CreatedAt(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1816,7 +1831,7 @@ func (ec *executionContext) _BookAudio_createdAt(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookPage_id(ctx context.Context, field graphql.CollectedField, obj *model.BookPage) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookPage_id(ctx context.Context, field graphql.CollectedField, obj *books.BookPage) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1851,7 +1866,7 @@ func (ec *executionContext) _BookPage_id(ctx context.Context, field graphql.Coll
 	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookPage_content(ctx context.Context, field graphql.CollectedField, obj *model.BookPage) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookPage_content(ctx context.Context, field graphql.CollectedField, obj *books.BookPage) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1886,7 +1901,7 @@ func (ec *executionContext) _BookPage_content(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BookPage_pageNumber(ctx context.Context, field graphql.CollectedField, obj *model.BookPage) (ret graphql.Marshaler) {
+func (ec *executionContext) _BookPage_pageNumber(ctx context.Context, field graphql.CollectedField, obj *books.BookPage) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1983,9 +1998,9 @@ func (ec *executionContext) _BookPagesWithPagination_bookPages(ctx context.Conte
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.BookPage)
+	res := resTmp.([]*books.BookPage)
 	fc.Result = res
-	return ec.marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx, field.Selections, res)
+	return ec.marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookPage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _BooksWithPagination_pagination(ctx context.Context, field graphql.CollectedField, obj *model.BooksWithPagination) (ret graphql.Marshaler) {
@@ -2050,9 +2065,9 @@ func (ec *executionContext) _BooksWithPagination_books(ctx context.Context, fiel
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Book)
+	res := resTmp.([]*books.Book)
 	fc.Result = res
-	return ec.marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
+	return ec.marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_register(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2218,9 +2233,9 @@ func (ec *executionContext) _Mutation_createBook(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Book)
+	res := resTmp.(*books.Book)
 	fc.Result = res
-	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
+	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateBook(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2260,9 +2275,9 @@ func (ec *executionContext) _Mutation_updateBook(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Book)
+	res := resTmp.(*books.Book)
 	fc.Result = res
-	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
+	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteBook(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2344,9 +2359,9 @@ func (ec *executionContext) _Mutation_createBookAudio(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.BookAudio)
+	res := resTmp.(*books.BookAudio)
 	fc.Result = res
-	return ec.marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx, field.Selections, res)
+	return ec.marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateBookAudio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2386,9 +2401,9 @@ func (ec *executionContext) _Mutation_updateBookAudio(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.BookAudio)
+	res := resTmp.(*books.BookAudio)
 	fc.Result = res
-	return ec.marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx, field.Selections, res)
+	return ec.marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteBookAudio(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2470,9 +2485,9 @@ func (ec *executionContext) _Mutation_createAuthor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Author)
+	res := resTmp.(*books.Author)
 	fc.Result = res
-	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateAuthor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2512,9 +2527,9 @@ func (ec *executionContext) _Mutation_updateAuthor(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Author)
+	res := resTmp.(*books.Author)
 	fc.Result = res
-	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deleteAuthor(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2596,9 +2611,9 @@ func (ec *executionContext) _Mutation_createPublisher(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Publisher)
+	res := resTmp.(*books.Publisher)
 	fc.Result = res
-	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, field.Selections, res)
+	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updatePublisher(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2638,9 +2653,9 @@ func (ec *executionContext) _Mutation_updatePublisher(ctx context.Context, field
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Publisher)
+	res := resTmp.(*books.Publisher)
 	fc.Result = res
-	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, field.Selections, res)
+	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_deletePublisher(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2790,7 +2805,7 @@ func (ec *executionContext) _PaginationType_total(ctx context.Context, field gra
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Publisher_id(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
+func (ec *executionContext) _Publisher_id(ctx context.Context, field graphql.CollectedField, obj *books.Publisher) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2825,7 +2840,7 @@ func (ec *executionContext) _Publisher_id(ctx context.Context, field graphql.Col
 	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Publisher_name(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
+func (ec *executionContext) _Publisher_name(ctx context.Context, field graphql.CollectedField, obj *books.Publisher) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2860,7 +2875,7 @@ func (ec *executionContext) _Publisher_name(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Publisher_books(ctx context.Context, field graphql.CollectedField, obj *model.Publisher) (ret graphql.Marshaler) {
+func (ec *executionContext) _Publisher_books(ctx context.Context, field graphql.CollectedField, obj *books.Publisher) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2887,9 +2902,9 @@ func (ec *executionContext) _Publisher_books(ctx context.Context, field graphql.
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Book)
+	res := resTmp.([]books.Book)
 	fc.Result = res
-	return ec.marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookᚄ(ctx, field.Selections, res)
+	return ec.marshalOBook2ᚕgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_self(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2954,9 +2969,9 @@ func (ec *executionContext) _Query_authors(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Author)
+	res := resTmp.([]*books.Author)
 	fc.Result = res
-	return ec.marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+	return ec.marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_author(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2996,9 +3011,9 @@ func (ec *executionContext) _Query_author(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Author)
+	res := resTmp.(*books.Author)
 	fc.Result = res
-	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
+	return ec.marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_publishers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3028,9 +3043,9 @@ func (ec *executionContext) _Query_publishers(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Publisher)
+	res := resTmp.([]*books.Publisher)
 	fc.Result = res
-	return ec.marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, field.Selections, res)
+	return ec.marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_pages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3109,9 +3124,9 @@ func (ec *executionContext) _Query_audios(ctx context.Context, field graphql.Col
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.BookAudio)
+	res := resTmp.([]*books.BookAudio)
 	fc.Result = res
-	return ec.marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx, field.Selections, res)
+	return ec.marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_publisher(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3151,9 +3166,9 @@ func (ec *executionContext) _Query_publisher(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Publisher)
+	res := resTmp.(*books.Publisher)
 	fc.Result = res
-	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, field.Selections, res)
+	return ec.marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_books(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3235,9 +3250,9 @@ func (ec *executionContext) _Query_book(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Book)
+	res := resTmp.(*books.Book)
 	fc.Result = res
-	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, field.Selections, res)
+	return ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4918,7 +4933,7 @@ func (ec *executionContext) unmarshalInputUpdatePublisherInput(ctx context.Conte
 
 var authorImplementors = []string{"Author"}
 
-func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, obj *model.Author) graphql.Marshaler {
+func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, obj *books.Author) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, authorImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -4952,7 +4967,7 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 
 var bookImplementors = []string{"Book"}
 
-func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj *model.Book) graphql.Marshaler {
+func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj *books.Book) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, bookImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -4964,28 +4979,55 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._Book_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Book_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "author":
-			out.Values[i] = ec._Book_author(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Book_author(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "publisher":
-			out.Values[i] = ec._Book_publisher(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Book_publisher(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "createdAt":
-			out.Values[i] = ec._Book_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Book_createdAt(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4999,7 +5041,7 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 
 var bookAudioImplementors = []string{"BookAudio"}
 
-func (ec *executionContext) _BookAudio(ctx context.Context, sel ast.SelectionSet, obj *model.BookAudio) graphql.Marshaler {
+func (ec *executionContext) _BookAudio(ctx context.Context, sel ast.SelectionSet, obj *books.BookAudio) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, bookAudioImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -5011,38 +5053,65 @@ func (ec *executionContext) _BookAudio(ctx context.Context, sel ast.SelectionSet
 		case "id":
 			out.Values[i] = ec._BookAudio_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "createdBy":
-			out.Values[i] = ec._BookAudio_createdBy(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._BookAudio_createdBy(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "audio":
 			out.Values[i] = ec._BookAudio_audio(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "book":
-			out.Values[i] = ec._BookAudio_book(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._BookAudio_book(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "cursorStarts":
 			out.Values[i] = ec._BookAudio_cursorStarts(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "cursorEnds":
 			out.Values[i] = ec._BookAudio_cursorEnds(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "createdAt":
-			out.Values[i] = ec._BookAudio_createdAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._BookAudio_createdAt(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5056,7 +5125,7 @@ func (ec *executionContext) _BookAudio(ctx context.Context, sel ast.SelectionSet
 
 var bookPageImplementors = []string{"BookPage"}
 
-func (ec *executionContext) _BookPage(ctx context.Context, sel ast.SelectionSet, obj *model.BookPage) graphql.Marshaler {
+func (ec *executionContext) _BookPage(ctx context.Context, sel ast.SelectionSet, obj *books.BookPage) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, bookPageImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -5289,7 +5358,7 @@ func (ec *executionContext) _PaginationType(ctx context.Context, sel ast.Selecti
 
 var publisherImplementors = []string{"Publisher"}
 
-func (ec *executionContext) _Publisher(ctx context.Context, sel ast.SelectionSet, obj *model.Publisher) graphql.Marshaler {
+func (ec *executionContext) _Publisher(ctx context.Context, sel ast.SelectionSet, obj *books.Publisher) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, publisherImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -5747,11 +5816,11 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAuthor2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v model.Author) graphql.Marshaler {
+func (ec *executionContext) marshalNAuthor2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx context.Context, sel ast.SelectionSet, v books.Author) graphql.Marshaler {
 	return ec._Author(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *model.Author) graphql.Marshaler {
+func (ec *executionContext) marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *books.Author) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5761,11 +5830,11 @@ func (ec *executionContext) marshalNAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbook
 	return ec._Author(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNBook2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx context.Context, sel ast.SelectionSet, v model.Book) graphql.Marshaler {
+func (ec *executionContext) marshalNBook2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx context.Context, sel ast.SelectionSet, v books.Book) graphql.Marshaler {
 	return ec._Book(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx context.Context, sel ast.SelectionSet, v *model.Book) graphql.Marshaler {
+func (ec *executionContext) marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx context.Context, sel ast.SelectionSet, v *books.Book) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5775,11 +5844,11 @@ func (ec *executionContext) marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooks�
 	return ec._Book(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNBookAudio2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v model.BookAudio) graphql.Marshaler {
+func (ec *executionContext) marshalNBookAudio2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v books.BookAudio) graphql.Marshaler {
 	return ec._BookAudio(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v *model.BookAudio) graphql.Marshaler {
+func (ec *executionContext) marshalNBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v *books.BookAudio) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5882,6 +5951,21 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	res, err := graphql.UnmarshalInt64(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	res := graphql.MarshalInt64(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNLoginInput2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐLoginInput(ctx context.Context, v interface{}) (model.LoginInput, error) {
 	res, err := ec.unmarshalInputLoginInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5897,11 +5981,11 @@ func (ec *executionContext) marshalNPaginationType2ᚖgitlabᚗcomᚋkian00shᚋ
 	return ec._PaginationType(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPublisher2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx context.Context, sel ast.SelectionSet, v model.Publisher) graphql.Marshaler {
+func (ec *executionContext) marshalNPublisher2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx context.Context, sel ast.SelectionSet, v books.Publisher) graphql.Marshaler {
 	return ec._Publisher(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx context.Context, sel ast.SelectionSet, v *model.Publisher) graphql.Marshaler {
+func (ec *executionContext) marshalNPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx context.Context, sel ast.SelectionSet, v *books.Publisher) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -6214,7 +6298,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v []*model.Author) graphql.Marshaler {
+func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx context.Context, sel ast.SelectionSet, v []*books.Author) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6241,7 +6325,7 @@ func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockb
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx, sel, v[i])
+			ret[i] = ec.marshalOAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6254,14 +6338,14 @@ func (ec *executionContext) marshalOAuthor2ᚕᚖgitlabᚗcomᚋkian00shᚋrockb
 	return ret
 }
 
-func (ec *executionContext) marshalOAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *model.Author) graphql.Marshaler {
+func (ec *executionContext) marshalOAuthor2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *books.Author) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Author(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx context.Context, sel ast.SelectionSet, v []*model.Book) graphql.Marshaler {
+func (ec *executionContext) marshalOBook2ᚕgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookᚄ(ctx context.Context, sel ast.SelectionSet, v []books.Book) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6288,7 +6372,7 @@ func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockboo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, sel, v[i])
+			ret[i] = ec.marshalNBook2gitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6301,7 +6385,7 @@ func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockboo
 	return ret
 }
 
-func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Book) graphql.Marshaler {
+func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx context.Context, sel ast.SelectionSet, v []*books.Book) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6328,7 +6412,7 @@ func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockboo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx, sel, v[i])
+			ret[i] = ec.marshalOBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6341,14 +6425,14 @@ func (ec *executionContext) marshalOBook2ᚕᚖgitlabᚗcomᚋkian00shᚋrockboo
 	return ret
 }
 
-func (ec *executionContext) marshalOBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBook(ctx context.Context, sel ast.SelectionSet, v *model.Book) graphql.Marshaler {
+func (ec *executionContext) marshalOBook2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBook(ctx context.Context, sel ast.SelectionSet, v *books.Book) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Book(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v []*model.BookAudio) graphql.Marshaler {
+func (ec *executionContext) marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v []*books.BookAudio) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6375,7 +6459,7 @@ func (ec *executionContext) marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋro
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx, sel, v[i])
+			ret[i] = ec.marshalOBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6388,14 +6472,14 @@ func (ec *executionContext) marshalOBookAudio2ᚕᚖgitlabᚗcomᚋkian00shᚋro
 	return ret
 }
 
-func (ec *executionContext) marshalOBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v *model.BookAudio) graphql.Marshaler {
+func (ec *executionContext) marshalOBookAudio2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookAudio(ctx context.Context, sel ast.SelectionSet, v *books.BookAudio) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._BookAudio(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx context.Context, sel ast.SelectionSet, v []*model.BookPage) graphql.Marshaler {
+func (ec *executionContext) marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookPage(ctx context.Context, sel ast.SelectionSet, v []*books.BookPage) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6422,7 +6506,7 @@ func (ec *executionContext) marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋroc
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx, sel, v[i])
+			ret[i] = ec.marshalOBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookPage(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6435,7 +6519,7 @@ func (ec *executionContext) marshalOBookPage2ᚕᚖgitlabᚗcomᚋkian00shᚋroc
 	return ret
 }
 
-func (ec *executionContext) marshalOBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐBookPage(ctx context.Context, sel ast.SelectionSet, v *model.BookPage) graphql.Marshaler {
+func (ec *executionContext) marshalOBookPage2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐBookPage(ctx context.Context, sel ast.SelectionSet, v *books.BookPage) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6489,7 +6573,7 @@ func (ec *executionContext) unmarshalOPaginationInput2ᚖgitlabᚗcomᚋkian00sh
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx context.Context, sel ast.SelectionSet, v []*model.Publisher) graphql.Marshaler {
+func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx context.Context, sel ast.SelectionSet, v []*books.Publisher) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6516,7 +6600,7 @@ func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋro
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx, sel, v[i])
+			ret[i] = ec.marshalOPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6529,7 +6613,7 @@ func (ec *executionContext) marshalOPublisher2ᚕᚖgitlabᚗcomᚋkian00shᚋro
 	return ret
 }
 
-func (ec *executionContext) marshalOPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋgraphᚋmodelᚐPublisher(ctx context.Context, sel ast.SelectionSet, v *model.Publisher) graphql.Marshaler {
+func (ec *executionContext) marshalOPublisher2ᚖgitlabᚗcomᚋkian00shᚋrockbooksᚑbeᚋsrcᚋhandlersᚋbooksᚐPublisher(ctx context.Context, sel ast.SelectionSet, v *books.Publisher) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

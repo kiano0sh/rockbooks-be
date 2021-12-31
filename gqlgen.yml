@@ -54,7 +54,13 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  # Author:
-  #   model: gitlab.com/kian00sh/rockbooks-be/graph/model.Author
-  # Publisher:
-  #   model: gitlab.com/kian00sh/rockbooks-be/graph/model.Publisher
+  Book:
+    model: gitlab.com/kian00sh/rockbooks-be/src/handlers/books.Book
+  BookPage:
+    model: gitlab.com/kian00sh/rockbooks-be/src/handlers/books.BookPage
+  BookAudio:
+    model: gitlab.com/kian00sh/rockbooks-be/src/handlers/books.BookAudio
+  Author:
+    model: gitlab.com/kian00sh/rockbooks-be/src/handlers/books.Author
+  Publisher:
+    model: gitlab.com/kian00sh/rockbooks-be/src/handlers/books.Publisher

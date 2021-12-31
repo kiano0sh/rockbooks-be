@@ -8,46 +8,17 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/books"
 )
 
-type Author struct {
-	ID    int64   `json:"id"`
-	Name  string  `json:"name"`
-	Books []*Book `json:"books"`
-}
-
-type Book struct {
-	ID        int64      `json:"id"`
-	Name      string     `json:"name"`
-	Author    *Author    `json:"author"`
-	Publisher *Publisher `json:"publisher"`
-	CreatedAt string     `json:"createdAt"`
-}
-
-type BookAudio struct {
-	ID           int64  `json:"id"`
-	CreatedBy    *User  `json:"createdBy"`
-	Audio        string `json:"audio"`
-	Book         *Book  `json:"book"`
-	CursorStarts int    `json:"cursorStarts"`
-	CursorEnds   int    `json:"cursorEnds"`
-	CreatedAt    string `json:"createdAt"`
-}
-
-type BookPage struct {
-	ID         int64  `json:"id"`
-	Content    string `json:"content"`
-	PageNumber int    `json:"pageNumber"`
-}
-
 type BookPagesWithPagination struct {
-	Pagination *PaginationType `json:"pagination"`
-	BookPages  []*BookPage     `json:"bookPages"`
+	Pagination *PaginationType   `json:"pagination"`
+	BookPages  []*books.BookPage `json:"bookPages"`
 }
 
 type BooksWithPagination struct {
 	Pagination *PaginationType `json:"pagination"`
-	Books      []*Book         `json:"books"`
+	Books      []*books.Book   `json:"books"`
 }
 
 type CreateAuthorInput struct {
@@ -88,12 +59,6 @@ type PaginationType struct {
 	Limit int `json:"limit"`
 	Page  int `json:"page"`
 	Total int `json:"total"`
-}
-
-type Publisher struct {
-	ID    int64   `json:"id"`
-	Name  string  `json:"name"`
-	Books []*Book `json:"books"`
 }
 
 type RefreshTokenInput struct {
