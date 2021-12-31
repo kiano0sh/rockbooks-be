@@ -44,9 +44,13 @@ type Book struct {
 	pagination.PaginationInput `gorm:"-"`
 	ID                         int64
 	Name                       string `gorm:"size:128"`
+	Cover                      string `gorm:"size:256"`
+	Wallpaper                  string `gorm:"size:256"`
 	Pages                      []BookPage
 	AudioBooks                 []BookAudio
 	AuthorID                   int64
 	PublisherID                int64
 	BookFile                   graphql.Upload `gorm:"-"`
+	WallpaperFile              graphql.Upload `gorm:"-"`
+	CoverFile                  graphql.Upload `gorm:"-"`
 }
