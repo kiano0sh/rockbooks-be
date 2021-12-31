@@ -154,6 +154,8 @@ type BookPagesWithPagination {
 type Book {
   id: ID!
   name: String!
+  cover: String!
+  wallpaper: String!
   author: Author!
   publisher: Publisher!
   createdAt: String!
@@ -169,6 +171,8 @@ input CreateBookInput {
   authorId: ID!
   publisherId: ID!
   bookFile: Upload!
+  wallpaperFile: Upload!
+  coverFile: Upload!
 }
 
 input UpdateBookInput {

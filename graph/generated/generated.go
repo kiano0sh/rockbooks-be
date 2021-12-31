@@ -54,10 +54,12 @@ type ComplexityRoot struct {
 
 	Book struct {
 		Author    func(childComplexity int) int
+		Cover     func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Name      func(childComplexity int) int
 		Publisher func(childComplexity int) int
+		Wallpaper func(childComplexity int) int
 	}
 
 	BookAudio struct {
@@ -219,6 +221,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Book.Author(childComplexity), true
 
+	case "Book.cover":
+		if e.complexity.Book.Cover == nil {
+			break
+		}
+
+		return e.complexity.Book.Cover(childComplexity), true
+
 	case "Book.createdAt":
 		if e.complexity.Book.CreatedAt == nil {
 			break
@@ -246,6 +255,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Book.Publisher(childComplexity), true
+
+	case "Book.wallpaper":
+		if e.complexity.Book.Wallpaper == nil {
+			break
+		}
+
+		return e.complexity.Book.Wallpaper(childComplexity), true
 
 	case "BookAudio.audio":
 		if e.complexity.BookAudio.Audio == nil {
@@ -901,6 +917,8 @@ type BookPagesWithPagination {
 type Book {
   id: ID!
   name: String!
+  cover: String!
+  wallpaper: String!
   author: Author!
   publisher: Publisher!
   createdAt: String!
@@ -916,6 +934,8 @@ input CreateBookInput {
   authorId: ID!
   publisherId: ID!
   bookFile: Upload!
+  wallpaperFile: Upload!
+  coverFile: Upload!
 }
 
 input UpdateBookInput {
@@ -1465,6 +1485,76 @@ func (ec *executionContext) _Book_name(ctx context.Context, field graphql.Collec
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Book_cover(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Book",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cover, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Book_wallpaper(ctx context.Context, field graphql.CollectedField, obj *books.Book) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Book",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Wallpaper, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4617,6 +4707,22 @@ func (ec *executionContext) unmarshalInputCreateBookInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "wallpaperFile":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("wallpaperFile"))
+			it.WallpaperFile, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "coverFile":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coverFile"))
+			it.CoverFile, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -4983,6 +5089,16 @@ func (ec *executionContext) _Book(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "name":
 			out.Values[i] = ec._Book_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "cover":
+			out.Values[i] = ec._Book_cover(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "wallpaper":
+			out.Values[i] = ec._Book_wallpaper(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

@@ -95,6 +95,8 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.CreateBoo
 	var book books.Book
 	book.Name = input.Name
 	book.BookFile = input.BookFile
+	book.CoverFile = input.CoverFile
+	book.WallpaperFile = input.WallpaperFile
 	book.AuthorID = input.AuthorID
 	book.PublisherID = input.PublisherID
 	createdBook, err := book.CreateBook()

@@ -33,10 +33,12 @@ type CreateBookAudioInput struct {
 }
 
 type CreateBookInput struct {
-	Name        string         `json:"name"`
-	AuthorID    int64          `json:"authorId"`
-	PublisherID int64          `json:"publisherId"`
-	BookFile    graphql.Upload `json:"bookFile"`
+	Name          string         `json:"name"`
+	AuthorID      int64          `json:"authorId"`
+	PublisherID   int64          `json:"publisherId"`
+	BookFile      graphql.Upload `json:"bookFile"`
+	WallpaperFile graphql.Upload `json:"wallpaperFile"`
+	CoverFile     graphql.Upload `json:"coverFile"`
 }
 
 type CreatePublisherInput struct {
