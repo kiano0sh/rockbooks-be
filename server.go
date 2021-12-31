@@ -46,6 +46,8 @@ func main() {
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 	router.Handle("/graphql", srv)
+	fs := http.FileServer(http.Dir("media"))
+	router.Handle("/media/*", http.StripPrefix("/media/", fs))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground 🚀", port)
 	log.Fatal(http.ListenAndServe(":"+port, router))
