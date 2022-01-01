@@ -6,5 +6,13 @@ import (
 )
 
 func PaginationInputToPaginationOutput(paginationInput model.PaginationInput) *pagination.PaginationOutput {
-	return &pagination.PaginationOutput{Limit: *paginationInput.Limit, Page: *paginationInput.Page, SortBy: paginationInput.SortBy.String(), SortOrder: paginationInput.SortOrder.String()}
+	sortBy := "Id"
+	if paginationInput.SortBy != nil {
+		sortBy = paginationInput.SortBy.String()
+	}
+	sortOrder := "ASC"
+	if paginationInput.SortOrder != nil {
+		sortOrder = paginationInput.SortOrder.String()
+	}
+	return &pagination.PaginationOutput{Limit: *paginationInput.Limit, Page: *paginationInput.Page, SortBy: sortBy, SortOrder: sortOrder}
 }

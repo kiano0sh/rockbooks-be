@@ -66,15 +66,7 @@ func Paginate(value interface{}, pagination *Pagination, db *gorm.DB) func(db *g
 }
 
 func GenerateSortStatement(pagination *PaginationOutput) string {
-	sortBy := "Id"
-	if pagination.SortBy != "" {
-		sortBy = pagination.SortBy
-	}
-	sortOrder := "ASC"
-	if pagination.SortOrder != "" {
-		sortOrder = pagination.SortOrder
-	}
-	return sortBy + " " + sortOrder
+	return pagination.SortBy + " " + pagination.SortOrder
 }
 
 func CreatePaginationInput(pagination *PaginationOutput) PaginationInput {

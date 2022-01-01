@@ -29,7 +29,7 @@ func (book *Book) CreateBook() (*Book, error) {
 		if err != nil {
 			grapherrors.ReturnGQLError("مشکلی در ثبت صفحات کتاب پیش آمده است", err)
 		}
-		pages = append(pages, BookPage{Content: text, PageNumber: pageNumber})
+		pages = append(pages, BookPage{Content: text, PageNumber: pageNumber + 1})
 	}
 	// Add pages to book object
 	book.Pages = pages
@@ -113,58 +113,3 @@ func (book *Book) GetBookPublisher() (*Publisher, error) {
 	}
 	return publisherResult, nil
 }
-
-// BookPage
-func (bookPage *BookPage) GetBookPages() ([]*BookPage, *pagination.Pagination, error) {
-	var bookPagesResult []*BookPage
-	var paginationResult pagination.Pagination
-	paginationResult.PaginationInput = bookPage.PaginationInput
-	result := database.DB.Scopes(pagination.Paginate(bookPagesResult, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&bookPagesResult)
-	if result.Error != nil {
-		return nil, nil, grapherrors.ReturnGQLError("در دریافت صفحات کتاب مشکلی پیش آمده!", result.Error)
-	}
-	return bookPagesResult, &paginationResult, nil
-}
-
-// Author
-
-func (author *Author) CreateAuthor() (*Author, error) {
-	result := database.DB.Create(&author)
-	if result.Error != nil {
-		return nil, grapherrors.ReturnGQLError("این نویسنده قبلا ثبت شده است", result.Error)
-	}
-	return author, nil
-}
-
-func (author *Author) GetAuthor() (*Author, error) {
-	var authorResult *Author
-	result := database.DB.Where("id = ?", author.ID).First(&authorResult)
-	if result.Error != nil {
-		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت نویسنده پیش آمده است!", result.Error)
-	}
-	// bookResult.auth
-	return authorResult, nil
-}
-
-// Publisher
-
-func (publisher *Publisher) CreatePublisher() (*Publisher, error) {
-	result := database.DB.Create(&publisher)
-	if result.Error != nil {
-		return nil, grapherrors.ReturnGQLError("این ناشر قبلا ثبت شده است", result.Error)
-	}
-	return publisher, nil
-}
-
-func (book *Publisher) GetPublisher() (*Publisher, error) {
-	var publisherResult *Publisher
-	result := database.DB.Where("id = ?", book.ID).First(&publisherResult)
-	if result.Error != nil {
-		return nil, grapherrors.ReturnGQLError("مشکلی در دریافت ناشر پیش آمده است!", result.Error)
-	}
-	// publisherResult.auth
-	return publisherResult, nil
-}
-
-// audios
-// pages
