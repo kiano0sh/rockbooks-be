@@ -13,6 +13,7 @@ import (
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
+	"gitlab.com/kian00sh/rockbooks-be/src/utils/objects"
 	mainPagination "gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
 )
 
@@ -180,7 +181,7 @@ func (r *queryResolver) Publishers(ctx context.Context) ([]*books.Publisher, err
 
 func (r *queryResolver) Pages(ctx context.Context, id int64, pagination *model.PaginationInput) (*model.BookPagesWithPagination, error) {
 	var bookPage books.BookPage
-	bookPage.PaginationInput = mainPagination.CreatePaginationInput(&mainPagination.PaginationOutput{Limit: *pagination.Limit, Page: *pagination.Page, SortBy: pagination.SortBy.String(), SortOrder: pagination.SortOrder.String()})
+	bookPage.PaginationInput = mainPagination.CreatePaginationInput(objects.PaginationInputToPaginationOutput(*pagination))
 	bookPage.BookID = id
 	pagesResult, paginationValues, err := bookPage.GetBookPages()
 	if err != nil {
@@ -202,7 +203,7 @@ func (r *queryResolver) Publisher(ctx context.Context, id int64) (*books.Publish
 
 func (r *queryResolver) Books(ctx context.Context, pagination *model.PaginationInput) (*model.BooksWithPagination, error) {
 	var booksInstance books.Book
-	booksInstance.PaginationInput = mainPagination.CreatePaginationInput(&mainPagination.PaginationOutput{Limit: *pagination.Limit, Page: *pagination.Page, SortBy: pagination.SortBy.String(), SortOrder: pagination.SortOrder.String()})
+	booksInstance.PaginationInput = mainPagination.CreatePaginationInput(objects.PaginationInputToPaginationOutput(*pagination))
 	booksResult, paginationValues, err := booksInstance.GetBooks()
 	if err != nil {
 		return nil, err
