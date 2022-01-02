@@ -89,7 +89,9 @@ func (books *Book) GetBooks() ([]*Book, *pagination.Pagination, error) {
 	var booksResult []*Book
 	var paginationResult pagination.Pagination
 	paginationResult.PaginationInput = books.PaginationInput
-	result := database.DB.Scopes(pagination.Paginate(booksResult, &paginationResult, database.DB)).Find(&booksResult)
+	var totalRows int64
+	database.DB.Model(booksResult).Count(&totalRows)
+	result := database.DB.Scopes(pagination.Paginate(totalRows, &paginationResult, database.DB)).Find(&booksResult)
 	if result.Error != nil {
 		return nil, nil, grapherrors.ReturnGQLError("در دریافت کتاب ها مشکلی پیش آمده است", result.Error)
 	}

@@ -11,7 +11,9 @@ func (bookPage *BookPage) GetBookPages() ([]*BookPage, *pagination.Pagination, e
 	var bookPagesResult []*BookPage
 	var paginationResult pagination.Pagination
 	paginationResult.PaginationInput = bookPage.PaginationInput
-	result := database.DB.Scopes(pagination.Paginate(bookPagesResult, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&bookPagesResult)
+	var totalRows int64
+	database.DB.Model(bookPagesResult).Where("book_id = ?", 1).Count(&totalRows)
+	result := database.DB.Scopes(pagination.Paginate(totalRows, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&bookPagesResult)
 	if result.Error != nil {
 		return nil, nil, grapherrors.ReturnGQLError("در دریافت صفحات کتاب مشکلی پیش آمده!", result.Error)
 	}
