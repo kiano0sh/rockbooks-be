@@ -124,7 +124,7 @@ type BookAudio {
 }
 
 input CreateBookAudioInput {
-  audio: String!
+  audio: Upload!
   bookId: ID!
   cursorStarts: Int!
   cursorEnds: Int!
