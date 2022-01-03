@@ -22,12 +22,13 @@ type Publisher struct {
 
 type BookAudio struct {
 	gorm.Model
-	ID           int64
-	Audio        string `gorm:"size:256"`
-	UserID       int64
-	BookID       int64
-	CursorStarts int64
-	CursorEnds   int64
+	ID            int64
+	Audio         string `gorm:"size:256"`
+	UserID        int64
+	BookID        int64
+	CursorStarts  int64
+	CursorEnds    int64
+	BookAudioFile graphql.Upload `gorm:"-"`
 }
 
 type BookPage struct {

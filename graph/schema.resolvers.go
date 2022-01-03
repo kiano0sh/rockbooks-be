@@ -12,6 +12,7 @@ import (
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/books"
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
+	"gitlab.com/kian00sh/rockbooks-be/src/middlewares/auth"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/objects"
 	mainPagination "gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
@@ -116,7 +117,21 @@ func (r *mutationResolver) DeleteBook(ctx context.Context, id int64) (bool, erro
 }
 
 func (r *mutationResolver) CreateBookAudio(ctx context.Context, input model.CreateBookAudioInput) (*books.BookAudio, error) {
-	panic(fmt.Errorf("not implemented"))
+	user, err := auth.ForContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var bookAudio books.BookAudio
+	bookAudio.UserID = user.ID
+	bookAudio.BookAudioFile = input.Audio
+	bookAudio.BookID = input.BookID
+	bookAudio.CursorStarts = int64(input.CursorStarts)
+	bookAudio.CursorEnds = int64(input.CursorEnds)
+	createdBook, err := bookAudio.CreateBookAudio()
+	if err != nil {
+		return nil, err
+	}
+	return createdBook, nil
 }
 
 func (r *mutationResolver) UpdateBookAudio(ctx context.Context, input model.UpdateBookAudioInput) (*books.BookAudio, error) {

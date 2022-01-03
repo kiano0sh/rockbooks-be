@@ -38,7 +38,7 @@ func (book *Book) CreateBook() (*Book, error) {
 	// Handle Book Cover
 	coverPath, err := strings.ConcatExtensionToEnd(mainFilePath+"-cover", book.CoverFile.ContentType)
 	if err != nil {
-		return nil, err
+		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت کاور کتاب پیش آمده است", err)
 	}
 	touchedCoverFile, err := os.OpenFile(coverPath, consts.CREATE_FILE_FLAG, consts.CREATE_FILE_PERMISSION)
 	if err != nil {
