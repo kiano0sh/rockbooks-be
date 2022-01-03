@@ -6,6 +6,7 @@ import (
 
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/jwt"
+	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
 )
 
 var userCtxKey = &contextKey{"user"}
@@ -25,7 +26,7 @@ func Middleware() func(http.Handler) http.Handler {
 				return
 			}
 
-			//validate jwt token
+			// Validate jwt token
 			tokenStr := header
 			email, err := jwt.ParseToken(tokenStr)
 			if err != nil {
@@ -33,7 +34,7 @@ func Middleware() func(http.Handler) http.Handler {
 				return
 			}
 
-			// create user and check if user exists in db
+			// Create user and check if user exists in db
 			user := users.User{Email: email}
 			id, err := users.GetUserIdByEmail(email)
 			if err != nil {
@@ -41,10 +42,10 @@ func Middleware() func(http.Handler) http.Handler {
 				return
 			}
 			user.ID = id
-			// put it in context
+			// Put it in context
 			ctx := context.WithValue(r.Context(), userCtxKey, &user)
 
-			// and call the next with our new context
+			// And call the next with our new context
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})
@@ -52,7 +53,11 @@ func Middleware() func(http.Handler) http.Handler {
 }
 
 // ForContext finds the user from the context. REQUIRES Middleware to have run.
-func ForContext(ctx context.Context) *users.User {
+func ForContext(ctx context.Context) (*users.User, error) {
 	raw, _ := ctx.Value(userCtxKey).(*users.User)
-	return raw
+	if raw == nil {
+		// http.Error(w, "Invalid token", http.StatusForbidden)
+		return nil, grapherrors.ReturnGQLError("دسترسی غیرمجاز!", "User has not found!")
+	}
+	return raw, nil
 }
