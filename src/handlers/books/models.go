@@ -2,6 +2,7 @@ package books
 
 import (
 	"github.com/99designs/gqlgen/graphql"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/pagination"
 	"gorm.io/gorm"
 )
@@ -25,6 +26,7 @@ type BookAudio struct {
 	ID            int64
 	Audio         string `gorm:"size:256"`
 	UserID        int64
+	User          users.User
 	BookID        int64
 	CursorStarts  int64
 	CursorEnds    int64
