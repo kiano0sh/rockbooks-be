@@ -26,10 +26,10 @@ type CreateAuthorInput struct {
 }
 
 type CreateBookAudioInput struct {
-	Audio        string `json:"audio"`
-	BookID       int64  `json:"bookId"`
-	CursorStarts int    `json:"cursorStarts"`
-	CursorEnds   int    `json:"cursorEnds"`
+	Audio        graphql.Upload `json:"audio"`
+	BookID       int64          `json:"bookId"`
+	CursorStarts int            `json:"cursorStarts"`
+	CursorEnds   int            `json:"cursorEnds"`
 }
 
 type CreateBookInput struct {

@@ -887,7 +887,7 @@ type BookAudio {
 }
 
 input CreateBookAudioInput {
-  audio: String!
+  audio: Upload!
   bookId: ID!
   cursorStarts: Int!
   cursorEnds: Int!
@@ -4635,7 +4635,7 @@ func (ec *executionContext) unmarshalInputCreateBookAudioInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("audio"))
-			it.Audio, err = ec.unmarshalNString2string(ctx, v)
+			it.Audio, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
 			if err != nil {
 				return it, err
 			}

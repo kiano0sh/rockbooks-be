@@ -7,6 +7,7 @@ require (
 	github.com/gen2brain/go-fitz v1.18.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.0.0
+	github.com/matoous/go-nanoid/v2 v2.0.0 // indirect
 	github.com/rs/cors v1.8.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	golang.org/x/crypto v0.0.0-20210813211128-0a44fdfbc16e
