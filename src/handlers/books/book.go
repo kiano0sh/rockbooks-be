@@ -38,6 +38,11 @@ func (book *Book) CreateBook() (*Book, error) {
 	// Add pages to book object
 	book.Pages = pages
 
+	err = os.MkdirAll(consts.IMAGES_PATH, os.ModePerm)
+	if err != nil {
+		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت کاور کتاب پیش آمده است", err)
+	}
+
 	mainFilePath := consts.IMAGES_PATH + strings.NormalizeMediaName(book.Name)
 	// Handle Book Cover
 	coverPath, err := strings.ConcatExtensionToEnd(mainFilePath+"-cover", book.CoverFile.ContentType)
