@@ -26,6 +26,7 @@ func (book *Book) CreateBook() (*Book, error) {
 	// Extract pages as text
 	for pageNumber := 0; pageNumber < theBook.NumPage(); pageNumber++ {
 		text, err := theBook.Text(pageNumber)
+		// TODO fix the pageNumber
 		if text == "" {
 			continue
 		}
