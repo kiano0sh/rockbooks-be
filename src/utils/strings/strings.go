@@ -13,9 +13,9 @@ func NormalizeMediaName(name string) string {
 }
 
 func ConcatExtensionToEnd(name string, contentType string) (string, error) {
-	coverExtension, err := mime.ExtensionsByType(contentType)
+	fileExtension, err := mime.ExtensionsByType(contentType)
 	if err != nil {
 		return "", grapherrors.ReturnGQLError("فرمت فایل مشکل دارد", err)
 	}
-	return name + coverExtension[len(coverExtension)-1], nil
+	return name + fileExtension[len(fileExtension)-1], nil
 }

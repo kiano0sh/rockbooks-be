@@ -11,7 +11,6 @@ import (
 	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/consts"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
-	"gitlab.com/kian00sh/rockbooks-be/src/utils/strings"
 )
 
 // Books
@@ -28,10 +27,7 @@ func (bookAudio *BookAudio) CreateBookAudio() (*BookAudio, error) {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت صوت کتاب پیش آمده است", err)
 	}
 	// Handle Book Cover
-	audioPath, err := strings.ConcatExtensionToEnd(filepath.Join(mainFilePath, fileID), bookAudio.BookAudioFile.ContentType)
-	if err != nil {
-		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت صوت کتاب پیش آمده است", err)
-	}
+	audioPath := filepath.Join(mainFilePath, fileID) + ".wav"
 	touchedAudioFile, err := os.OpenFile(audioPath, consts.CREATE_FILE_FLAG, consts.CREATE_FILE_PERMISSION)
 	if err != nil {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت صوت کتاب پیش آمده است", err)
