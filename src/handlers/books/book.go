@@ -26,6 +26,9 @@ func (book *Book) CreateBook() (*Book, error) {
 	// Extract pages as text
 	for pageNumber := 0; pageNumber < theBook.NumPage(); pageNumber++ {
 		text, err := theBook.Text(pageNumber)
+		if text == "" {
+			continue
+		}
 		if err != nil {
 			grapherrors.ReturnGQLError("مشکلی در ثبت صفحات کتاب پیش آمده است", err)
 		}
