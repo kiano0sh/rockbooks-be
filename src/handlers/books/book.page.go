@@ -12,10 +12,19 @@ func (bookPage *BookPage) GetBookPages() ([]*BookPage, *pagination.Pagination, e
 	var paginationResult pagination.Pagination
 	paginationResult.PaginationInput = bookPage.PaginationInput
 	var totalRows int64
-	database.DB.Model(bookPagesResult).Where("book_id = ?", 1).Count(&totalRows)
+	database.DB.Model(bookPagesResult).Where("book_id = ?", bookPage.BookID).Count(&totalRows)
 	result := database.DB.Scopes(pagination.Paginate(totalRows, &paginationResult, database.DB)).Where("book_id = ?", bookPage.BookID).Find(&bookPagesResult)
 	if result.Error != nil {
 		return nil, nil, grapherrors.ReturnGQLError("در دریافت صفحات کتاب مشکلی پیش آمده!", result.Error)
 	}
 	return bookPagesResult, &paginationResult, nil
+}
+
+func (bookPage *BookPage) GetBookPageAudios() ([]*BookAudio, error) {
+	var bookAudiosResult []*BookAudio
+	result := database.DB.Where("book_page_id = ?", bookPage.ID).Find(&bookAudiosResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("در دریافت صوت این صفحه مشکلی پیش آمده!", result.Error)
+	}
+	return bookAudiosResult, nil
 }
