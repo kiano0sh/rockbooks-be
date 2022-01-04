@@ -27,7 +27,7 @@ type BookAudio struct {
 	Audio         string `gorm:"size:256"`
 	UserID        int64
 	User          users.User
-	BookID        int64
+	BookPageID    int64
 	CursorStarts  int64
 	CursorEnds    int64
 	BookAudioFile graphql.Upload `gorm:"-"`
@@ -50,7 +50,6 @@ type Book struct {
 	Cover                      string `gorm:"size:256"`
 	Wallpaper                  string `gorm:"size:256"`
 	Pages                      []BookPage
-	AudioBooks                 []BookAudio
 	AuthorID                   int64
 	PublisherID                int64
 	BookFile                   graphql.Upload `gorm:"-"`
