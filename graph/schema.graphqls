@@ -117,7 +117,7 @@ type BookAudio {
   id: ID!
   createdBy: User!
   audio: String!
-  book: Book!
+  bookPage: BookPage!
   cursorStarts: Int!
   cursorEnds: Int!
   createdAt: String!
@@ -125,7 +125,7 @@ type BookAudio {
 
 input CreateBookAudioInput {
   audio: Upload!
-  bookId: ID!
+  bookPageID: ID!
   cursorStarts: Int!
   cursorEnds: Int!
 }
@@ -143,6 +143,7 @@ type BookPage {
   id: ID!
   content: String!
   pageNumber: Int!
+  bookAudios: [BookAudio]
 }
 
 type BookPagesWithPagination {

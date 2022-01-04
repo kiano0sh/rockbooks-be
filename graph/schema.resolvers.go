@@ -38,16 +38,28 @@ func (r *bookResolver) CreatedAt(ctx context.Context, obj *books.Book) (string, 
 	return obj.CreatedAt.String(), nil
 }
 
-func (r *bookAudioResolver) CreatedBy(ctx context.Context, obj *books.BookAudio) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *bookAudioResolver) CreatedBy(ctx context.Context, obj *books.BookAudio) (*users.User, error) {
+	audioUserResult, err := obj.GetBookAudioUser()
+	if err != nil {
+		return nil, err
+	}
+	return audioUserResult, nil
 }
 
-func (r *bookAudioResolver) Book(ctx context.Context, obj *books.BookAudio) (*books.Book, error) {
+func (r *bookAudioResolver) BookPage(ctx context.Context, obj *books.BookAudio) (*books.BookPage, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *bookAudioResolver) CreatedAt(ctx context.Context, obj *books.BookAudio) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return obj.CreatedAt.String(), nil
+}
+
+func (r *bookPageResolver) BookAudios(ctx context.Context, obj *books.BookPage) ([]*books.BookAudio, error) {
+	bookAudiosResult, err := obj.GetBookPageAudios()
+	if err != nil {
+		return nil, err
+	}
+	return bookAudiosResult, nil
 }
 
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (string, error) {
@@ -124,7 +136,7 @@ func (r *mutationResolver) CreateBookAudio(ctx context.Context, input model.Crea
 	var bookAudio books.BookAudio
 	bookAudio.UserID = user.ID
 	bookAudio.BookAudioFile = input.Audio
-	bookAudio.BookID = input.BookID
+	bookAudio.BookPageID = input.BookPageID
 	bookAudio.CursorStarts = int64(input.CursorStarts)
 	bookAudio.CursorEnds = int64(input.CursorEnds)
 	createdBook, err := bookAudio.CreateBookAudio()
@@ -178,7 +190,7 @@ func (r *mutationResolver) DeletePublisher(ctx context.Context, id int64) (bool,
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Self(ctx context.Context) (*model.User, error) {
+func (r *queryResolver) Self(ctx context.Context) (*users.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -245,6 +257,9 @@ func (r *Resolver) Book() generated.BookResolver { return &bookResolver{r} }
 // BookAudio returns generated.BookAudioResolver implementation.
 func (r *Resolver) BookAudio() generated.BookAudioResolver { return &bookAudioResolver{r} }
 
+// BookPage returns generated.BookPageResolver implementation.
+func (r *Resolver) BookPage() generated.BookPageResolver { return &bookPageResolver{r} }
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -253,5 +268,6 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type bookResolver struct{ *Resolver }
 type bookAudioResolver struct{ *Resolver }
+type bookPageResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

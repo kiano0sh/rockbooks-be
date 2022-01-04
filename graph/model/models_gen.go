@@ -27,7 +27,7 @@ type CreateAuthorInput struct {
 
 type CreateBookAudioInput struct {
 	Audio        graphql.Upload `json:"audio"`
-	BookID       int64          `json:"bookId"`
+	BookPageID   int64          `json:"bookPageID"`
 	CursorStarts int            `json:"cursorStarts"`
 	CursorEnds   int            `json:"cursorEnds"`
 }
@@ -96,12 +96,6 @@ type UpdateBookInput struct {
 type UpdatePublisherInput struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
-}
-
-type User struct {
-	DisplayName string  `json:"displayName"`
-	Email       string  `json:"email"`
-	Avatar      *string `json:"avatar"`
 }
 
 type SortByEnum string
