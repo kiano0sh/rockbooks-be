@@ -8,6 +8,7 @@ import (
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	database "gitlab.com/kian00sh/rockbooks-be/src/database/postgresql"
+	"gitlab.com/kian00sh/rockbooks-be/src/handlers/users"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/consts"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/grapherrors"
 	"gitlab.com/kian00sh/rockbooks-be/src/utils/strings"
@@ -17,7 +18,7 @@ import (
 
 func (bookAudio *BookAudio) CreateBookAudio() (*BookAudio, error) {
 
-	mainFilePath := consts.AUDIOS_PATH + fmt.Sprint(bookAudio.BookID)
+	mainFilePath := consts.AUDIOS_PATH + fmt.Sprint(bookAudio.BookPageID)
 	fileID, err := gonanoid.New()
 	if err != nil {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت صوت کتاب پیش آمده است", err)
@@ -50,4 +51,13 @@ func (bookAudio *BookAudio) CreateBookAudio() (*BookAudio, error) {
 		return nil, grapherrors.ReturnGQLError("مشکلی در ثبت صوت کتاب پیش آمده است", result.Error)
 	}
 	return bookAudio, nil
+}
+
+func (bookAudio *BookAudio) GetBookAudioUser() (*users.User, error) {
+	var bookAudioUserResult *users.User
+	result := database.DB.Where("id = ?", bookAudio.UserID).Find(&bookAudioUserResult)
+	if result.Error != nil {
+		return nil, grapherrors.ReturnGQLError("در دریافت سازنده صوت این صفحه مشکلی پیش آمده!", result.Error)
+	}
+	return bookAudioUserResult, nil
 }
