@@ -54,6 +54,8 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  User:
+    model: gitlab.com/kian00sh/rockbooks-be/src/handlers/users.User
   Book:
     model: gitlab.com/kian00sh/rockbooks-be/src/handlers/books.Book
   BookPage:
